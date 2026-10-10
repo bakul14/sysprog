@@ -1,14 +1,9 @@
 #!/bin/bash
 
 CONFIG="$1"
-shift
-while getopts "a:" opt; do
-    case "$opt" in
-        a) ALG="$OPTARG" ;;
-    esac
-done
+ALG="$3"
 
-if [ -z "$CONFIG" ] || [ -z "$ALG" ]; then
+if [ -z "$CONFIG" ] || [ "$2" != "-a" ] || [ -z "$ALG" ]; then
     echo "Использование: $0 <config> -a <gzip|bzip2|xz>"
     exit 1
 fi
@@ -33,8 +28,11 @@ if [ "$COUNT" -gt "$MAX_BACKUPS" ]; then
     EXCESS=$((COUNT - MAX_BACKUPS))
     if [ "$POLICY" = "oldest" ]; then
         ls -1t "${DST_DIR}"/backup_* | tail -n "$EXCESS" | xargs rm -f
-    else
+    elif [ "$POLICY" = "newest" ]; then
         ls -1t "${DST_DIR}"/backup_* | head -n "$EXCESS" | xargs rm -f
+    else
+        echo "Неизвестная политика: $POLICY (oldest|newest)"
+        exit 1
     fi
     echo "Удалено лишних архивов: $EXCESS (policy=$POLICY)"
 fi
