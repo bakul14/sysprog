@@ -1,4 +1,4 @@
-SRC_DIR=/home/user/data
-DST_DIR=/home/user/backups
+SRC_DIR=/home/bakul14/mag/sysprog
+DST_DIR=/home/bakul14/mag/sysprog/backups
 MAX_BACKUPS=5
 POLICY=oldest

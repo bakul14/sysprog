@@ -14,6 +14,15 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+user_exists() {
+    getent passwd "$1" >/dev/null 2>&1
+}
+
+if user_exists "$USERNAME"; then
+    echo "Пользователь '$USERNAME' уже существует"
+    exit 1
+fi
+
 find_free_uid() {
     local uid=1000
     while getent passwd "$uid" >/dev/null 2>&1; do
@@ -42,6 +51,7 @@ case "$KEY" in
         echo "${USERNAME}:${HASH}:${DAYS}::::::" >> /etc/shadow
         ;;
     root)
+        NEXT_UID=0
         HASH=$(openssl passwd -6 "$PASSWORD")
         echo "${USERNAME}:x:0:0::/root:/bin/bash" >> /etc/passwd
         echo "${USERNAME}:${HASH}:${DAYS}::::::" >> /etc/shadow
