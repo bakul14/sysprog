@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# /var/log/wtmp
+
 if [ $# -ne 1 ]; then
     echo "Использование: $0 <username>"
     exit 1
