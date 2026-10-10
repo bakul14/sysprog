@@ -1,4 +1,4 @@
-SRC_DIR=/home/bakul14/mag/sysprog
+SRC_DIR=/home/bakul14/mag/sysprog/task_2/test_logs
 DST_DIR=/home/bakul14/mag/sysprog/backups
 MAX_BACKUPS=5
 POLICY=oldest
