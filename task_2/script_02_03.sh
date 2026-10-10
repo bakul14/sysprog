@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 
 CONFIG="$1"
 ALG="$3"
