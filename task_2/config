@@ -1,0 +1,4 @@
+SRC_DIR=/home/user/data
+DST_DIR=/home/user/backups
+MAX_BACKUPS=5
+POLICY=oldest
