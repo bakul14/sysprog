@@ -14,7 +14,7 @@ case "$ALG" in
     gzip)  EXT=tar.gz;  TAR_OPT=z ;;
     bzip2) EXT=tar.bz2; TAR_OPT=j ;;
     xz)    EXT=tar.xz;  TAR_OPT=J ;;
-    *) echo "Неизвестный алгоритм: $ALG (gzip|bzip2|xz)"; exit 1 ;;
+    *) echo "Неизвестный алгоритм архивации: $ALG (gzip|bzip2|xz)"; exit 1 ;;
 esac
 
 mkdir -p "$DST_DIR"
