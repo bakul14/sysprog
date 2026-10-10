@@ -11,7 +11,7 @@ while getopts "a:" opt; do
 done
 
 if [ -z "$CONFIG" ] || [ -z "$ALG" ]; then
-    echo "Использование: $0 <config> -a <gzip|bzip2|xz>"
+    echo "Использование: $0 <path_to_config> -a <gzip|bzip2|xz>"
     exit 1
 fi
 
