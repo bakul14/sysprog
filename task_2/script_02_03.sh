@@ -2,9 +2,15 @@
 set -o pipefail
 
 CONFIG="$1"
-ALG="$3"
+shift
 
-if [ -z "$CONFIG" ] || [ "$2" != "-a" ] || [ -z "$ALG" ]; then
+while getopts "a:" opt; do
+    case "$opt" in
+        a) ALG="$OPTARG" ;;
+    esac
+done
+
+if [ -z "$CONFIG" ] || [ -z "$ALG" ]; then
     echo "Использование: $0 <config> -a <gzip|bzip2|xz>"
     exit 1
 fi

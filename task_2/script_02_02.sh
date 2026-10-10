@@ -14,24 +14,15 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-user_exists() {
-    getent passwd "$1" >/dev/null 2>&1
-}
-
-if user_exists "$USERNAME"; then
+if getent passwd "$USERNAME" >/dev/null 2>&1; then
     echo "Пользователь '$USERNAME' уже существует"
     exit 1
 fi
 
-find_free_uid() {
-    local uid=1000
-    while getent passwd "$uid" >/dev/null 2>&1; do
-        uid=$((uid + 1))
-    done
-    echo "$uid"
-}
-
-NEXT_UID=$(find_free_uid)
+NEXT_UID=1000
+while getent passwd "$NEXT_UID" >/dev/null 2>&1; do
+    NEXT_UID=$((NEXT_UID + 1))
+done
 DAYS=$(( $(date +%s) / 86400 ))
 
 # login:passwd:UID:GID:GECOS:home:shell
