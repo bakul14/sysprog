@@ -2,11 +2,20 @@
 
 echo "PID = $$"
 
-for s in {1..31}; do
-    [ $s -eq $(kill -l CHLD) ] && continue  # SIGCHLD
-    trap "echo signal $(kill -l $s) catched" $s
+max=$(kill -l RTMAX)
+for ((s = 1; s <= max; s++)); do
+    if [ $s -eq $(kill -l CHLD) ]; then  # SIGCHLD
+        continue
+    fi
+    trap "echo signal $s $(kill -l $s) catched" $s
 done
 
+callback_sigint() {
+    echo "CALLBACK: signal 2 INT catched"
+}
+
+trap callback_sigint INT
+
 while true; do
-    sleep 1
+    sleep 0.1
 done
