@@ -1,9 +1,6 @@
 #include <argp.h>
-#include <getopt.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <sysexits.h>
-#include <unistd.h>
 
 #include "filemanager.h"
 
