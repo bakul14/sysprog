@@ -17,9 +17,9 @@ sudo update-grub
 sudo reboot
 ```
 
-Нужно добавить Btrfs
+По варианту нужно добавить Btrfs
 
-## Как проверить
+## Проверка
 
 ```bash
 grep btrfs /proc/filesystems
