@@ -16,3 +16,5 @@ echo 'GRUB_TOP_LEVEL="/boot/vmlinux-7.3.0"' | sudo tee -a /etc/default/grub
 sudo update-grub
 sudo reboot
 ```
+
+Нужно добавить Btrfs
