@@ -11,10 +11,10 @@ for ((s = 1; s <= max; s++)); do
 done
 
 callback_sigint() {
-    echo "CALLBACK: signal 2 INT catched"
+    echo "CALLBACK: signal 2 SIGINT catched"
 }
 
-trap callback_sigint INT
+trap callback_sigint SIGINT
 
 while true; do
     sleep 0.1
