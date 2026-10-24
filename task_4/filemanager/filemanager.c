@@ -1,20 +1,9 @@
-#include <argp.h>
-#include <getopt.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <sysexits.h>
-#include <unistd.h>
-
 #include "filemanager.h"
 
-typedef enum
-{
-  FM_E_OK                 = 0,
-  FM_E_INCORRECT_ARGUMENT = 1,
-  FM_E_INTERNAL_ERROR     = 255,
-} FM_ERROR_TYPE;
+#include <stddef.h>
+#include <stdio.h>
 
-static FM_ERROR_TYPE create_file(const char *const file, const char *const mode)
+FM_ERROR_TYPE create_file(const char *const file, const char *const mode)
 {
   FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
 
@@ -27,7 +16,7 @@ static FM_ERROR_TYPE create_file(const char *const file, const char *const mode)
   return ret;
 }
 
-static FM_ERROR_TYPE delete_file(const char *const file)
+FM_ERROR_TYPE delete_file(const char *const file)
 {
   FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
 
@@ -35,29 +24,6 @@ static FM_ERROR_TYPE delete_file(const char *const file)
     if (0 == remove(file)) { ret = FM_E_OK; }
   } else {
     ret = FM_E_INCORRECT_ARGUMENT;
-  }
-
-  return ret;
-}
-
-int main(int argc, char *argv[])
-{
-  const struct argp argp = {0, 0, 0, k_program_desc};
-
-  argp_parse(0, argc, argv, 0, 0, 0);
-
-  const char *const filename = "aboba.txt";
-
-  int ret = EX_SOFTWARE;
-
-  if (FM_E_OK == create_file(filename, "w")) {
-    printf("File %s has been created\n\r", filename);
-    ret = EX_OK;
-  }
-
-  if (FM_E_OK == delete_file(filename)) {
-    printf("File %s has been deleted\n\r", filename);
-    ret = EX_OK;
   }
 
   return ret;
