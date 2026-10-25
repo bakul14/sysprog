@@ -8,7 +8,12 @@ FM_ERROR_TYPE create_file(const char *const file, const char *const mode)
   FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
 
   if ((NULL != file) && (NULL != mode)) {
-    if (NULL != fopen(file, mode)) { ret = FM_E_OK; }
+    FILE *const fp = fopen(file, mode);
+    
+    if (NULL != fp) {
+      if (0 == fclose(fp)) { ret = FM_E_OK; }
+    }
+    
   } else {
     ret = FM_E_INCORRECT_ARGUMENT;
   }

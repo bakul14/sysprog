@@ -1,0 +1,6 @@
+{
+  "[cpp]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+  "C_Cpp.intelliSenseEngine": "disabled"
+}
