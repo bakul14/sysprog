@@ -1,4 +1,4 @@
-#ifndef FILAMANAGER
+#ifndef FILEMANAGER
 
 #define FILEMANAGER
 
