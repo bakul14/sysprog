@@ -3,6 +3,7 @@
 #define OPTIONS
 
 #include <getopt.h>
+#include <stddef.h>
 
 static const struct option k_fm_options[] = {
   // clang-format off
