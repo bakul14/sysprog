@@ -1,11 +1,10 @@
-#include <getopt.h>
-#include <stdio.h>
-#include <sysexits.h>
-
 #include "filemanager.h"
 #include "options.h"
 
-static inline int convert_fmerr_to_syserr(const FM_ERROR_TYPE fm_err)
+#include <getopt.h>
+#include <sysexits.h>
+
+static inline int fm_err_to_sys_exist(const FM_ERROR_TYPE fm_err)
 {
   // clang-format off
   switch (fm_err) {
@@ -33,5 +32,5 @@ int main(int argc, char *argv[])
     }
   }
 
-  return convert_fmerr_to_syserr(fm_ret);
+  return fm_err_to_sys_exist(fm_ret);
 }
