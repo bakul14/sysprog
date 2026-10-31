@@ -1,103 +1,37 @@
-#include <argp.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sysexits.h>
 
 #include "filemanager.h"
+#include "options.h"
 
-static const char *const k_program_desc =
-  "A simple file manager to create and delete writable text files";
-
-static const struct argp_option argp_cli_opt[] = {
-  // clang-format off
-  {"create", 'c', "FILE", 0, "Создание файла"},
-  {"delete", 'd', "FILE", 0, "Удаление файла"},
-  {0}
-  // clang-format on
-};
-
-static const char *create_filename = NULL;
-static const char *delete_filename = NULL;
-
-static error_t argp_cli_cb(const int key, char *const arg, struct argp_state *const state)
+static inline int convert_fmerr_to_syserr(const FM_ERROR_TYPE fm_err)
 {
-  error_t ret = 0;
-
-  switch (key) {
-    case 'c': {
-      create_filename = arg;
-      break;
-    }
-    case 'd': {
-      delete_filename = arg;
-      break;
-    }
-    default: {
-      ret = ARGP_ERR_UNKNOWN;
-      break;
-    }
+  // clang-format off
+  switch (fm_err) {
+    case FM_E_OK: return EX_OK;
+    case FM_E_INCORRECT_ARGUMENT: return EX_NOINPUT;
+    case FM_E_INTERNAL_ERROR: return EX_SOFTWARE;
+    default: return EX_SOFTWARE;
   }
-
-  return ret;
+  // clang-format on
 }
 
 int main(int argc, char *argv[])
 {
-  const struct argp argp = {argp_cli_opt, argp_cli_cb, 0, k_program_desc};
+  FM_ERROR_TYPE fm_ret = FM_E_INTERNAL_ERROR;
 
-  argp_parse(&argp, argc, argv, 0, 0, 0);
+  if (1 == argc) {
+    fm_ret = FM_E_INCORRECT_ARGUMENT;
+    process_request('h', "");
 
-  if (!create_filename && !delete_filename) {
-    fprintf(stderr, "Call filemanager with the --help flag to see usages\n");
-    return EX_USAGE;
-  }
-
-  int ret = EX_OK; /* provided by sysexits */
-
-  if (create_filename) {
-    int err = EX_OK;
-
-    switch (create_file(create_filename, "w")) {
-      case FM_E_OK: {
-        printf("File %s has been created\n\r", create_filename);
-        break;
-      }
-      case FM_E_INCORRECT_ARGUMENT: {
-        fprintf(stderr, "Incorrect file path: %s\n\r", create_filename);
-        err = EX_NOINPUT;
-        break;
-      }
-      default: {
-        fprintf(stderr, "Failed to create file %s\n\r", create_filename);
-        err = EX_CANTCREAT;
-        break;
-      }
+  } else {
+    int cli_opt = -1;
+    while ((cli_opt = getopt_long(argc, argv, "", k_fm_options, NULL)) != -1) {
+      fm_ret = process_request(cli_opt, optarg);
+      if (FM_E_OK != fm_ret) { break; }
     }
-
-    if (EX_OK == ret) { ret = err; }
   }
 
-  if (delete_filename) {
-    int err = EX_OK;
-
-    switch (delete_file(delete_filename)) {
-      case FM_E_OK: {
-        printf("File %s has been deleted\n\r", delete_filename);
-        break;
-      }
-      case FM_E_INCORRECT_ARGUMENT: {
-        fprintf(stderr, "Incorrect file path: %s\n\r", delete_filename);
-        err = EX_NOINPUT;
-        break;
-      }
-      default: {
-        fprintf(stderr, "Failed to delete file %s\n\r", delete_filename);
-        err = EX_SOFTWARE;
-        break;
-      }
-    }
-
-    if (EX_OK == ret) { ret = err; }
-  }
-
-  return ret;
+  return convert_fmerr_to_syserr(fm_ret);
 }
