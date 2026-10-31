@@ -42,12 +42,20 @@ FM_ERROR_TYPE process_request(const int req, const char *const arg)
   switch (req) {
     case 'c': {
       ret = create_file(arg, "w");
-      if (FM_E_OK == ret) { printf("File %s has been created\n", arg); }
+      if (FM_E_OK == ret) {
+        printf("File %s has been created\n", arg);
+      } else {
+        printf("File %s has not been created\n", arg);
+      }
       break;
     }
     case 'd': {
       ret = delete_file(arg);
-      if (FM_E_OK == ret) { printf("File %s has been deleted\n", arg); }
+      if (FM_E_OK == ret) {
+        printf("File %s has been deleted\n", arg);
+      } else {
+        printf("File %s has not been deleted\n", arg);
+      }
       break;
     }
     case 'h': {
