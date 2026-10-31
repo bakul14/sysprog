@@ -2,3 +2,4 @@ backups/
 *.out
 disk.img
 filemanager
+!filemanager/
