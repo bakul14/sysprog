@@ -19,12 +19,12 @@ static constexpr char k_file_create_denied[] = "File %s has not been created: pe
 static constexpr char k_file_delete_denied[] = "File %s has not been deleted: permission denied\n";
 static constexpr char k_no_file_path[]       = "File path is not specified\n";
 
-static const char *create_file(const char *const file, int *const status)
+static const char *create_file(const char *const filepath, int *const status)
 {
   const char *msg = k_no_file_path;
 
-  if (nullptr != file) {
-    FILE *const fp = fopen(file, "wx");
+  if (nullptr != filepath) {
+    FILE *const fp = fopen(filepath, "wx");
 
     if (nullptr == fp) {
       switch (errno) {
@@ -65,12 +65,12 @@ static const char *create_file(const char *const file, int *const status)
   return msg;
 }
 
-static const char *delete_file(const char *const file, int *const status)
+static const char *delete_file(const char *const filepath, int *const status)
 {
   const char *msg = k_no_file_path;
 
-  if (nullptr != file) {
-    if (0 == remove(file)) {
+  if (nullptr != filepath) {
+    if (0 == remove(filepath)) {
       msg     = k_file_deleted;
       *status = EX_OK;
     } else {
