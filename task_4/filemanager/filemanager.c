@@ -3,70 +3,84 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <sysexits.h>
 
-static FM_ERROR_TYPE create_file(const char *const file, const char *const mode)
+static const char *const k_msg_created      = "File %s has been created\n";
+static const char *const k_msg_not_created  = "File %s has not been created\n";
+static const char *const k_msg_close_failed = "File %s has been created, but could not be closed\n";
+static const char *const k_msg_deleted      = "File %s has been deleted\n";
+static const char *const k_msg_not_deleted  = "File %s has not been deleted\n";
+static const char *const k_msg_no_file_path = "File path is not specified\n";
+
+static const char *create_file(const char *const file, int *const status)
 {
-  FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
-
-  if ((NULL != file) && (NULL != mode)) {
-    FILE *const fp = fopen(file, mode);
-
-    if (NULL != fp) {
-      if (0 == fclose(fp)) { ret = FM_E_OK; }
-    }
-
-  } else {
-    ret = FM_E_INCORRECT_ARGUMENT;
-  }
-
-  return ret;
-}
-
-static FM_ERROR_TYPE delete_file(const char *const file)
-{
-  FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
+  const char *msg = k_msg_no_file_path;
 
   if (NULL != file) {
-    if (0 == remove(file)) { ret = FM_E_OK; }
+    FILE *const fp = fopen(file, "w");
+
+    if (NULL == fp) {
+      msg     = k_msg_not_created;
+      *status = EX_CANTCREAT;
+    } else if (0 != fclose(fp)) {
+      msg     = k_msg_close_failed;
+      *status = EX_IOERR;
+    } else {
+      msg     = k_msg_created;
+      *status = EX_OK;
+    }
   } else {
-    ret = FM_E_INCORRECT_ARGUMENT;
+    *status = EX_USAGE;
   }
 
-  return ret;
+  return msg;
 }
 
-FM_ERROR_TYPE process_request(const int req, const char *const arg)
+static const char *delete_file(const char *const file, int *const status)
 {
-  FM_ERROR_TYPE ret = FM_E_INTERNAL_ERROR;
+  const char *msg = k_msg_no_file_path;
+
+  if (NULL != file) {
+    if (0 == remove(file)) {
+      msg     = k_msg_deleted;
+      *status = EX_OK;
+    } else {
+      msg     = k_msg_not_deleted;
+      *status = EX_NOINPUT;
+    }
+  } else {
+    *status = EX_USAGE;
+  }
+
+  return msg;
+}
+
+int fm_process_request(const int req, const char *const arg)
+{
+  int ret = EX_SOFTWARE;
+
+  const char *msg = k_help_message;
 
   switch (req) {
     case 'c': {
-      ret = create_file(arg, "w");
-      if (FM_E_OK == ret) {
-        printf("File %s has been created\n", arg);
-      } else {
-        printf("File %s has not been created\n", arg);
-      }
+      msg = create_file(arg, &ret);
       break;
     }
     case 'd': {
-      ret = delete_file(arg);
-      if (FM_E_OK == ret) {
-        printf("File %s has been deleted\n", arg);
-      } else {
-        printf("File %s has not been deleted\n", arg);
-      }
+      msg = delete_file(arg, &ret);
       break;
     }
     case 'h': {
-      /* [[fallthrough]] */
+      ret = EX_OK;
+      break;
     }
     default: {
-      printf("%s", k_help_message);
-      ret = FM_E_OK;
+      ret = EX_USAGE;
       break;
     }
   }
+
+  printf(msg, arg);
 
   return ret;
 }
