@@ -7,7 +7,8 @@
 #include <sysexits.h>
 
 static const char *const k_help_message =
-  "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n";
+  "\nA simple file manager that allows to create or delete one file per launch.\n\n"
+  "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n\n";
 static const char *const k_file_close_failed =
   "File %s has been created, but could not be closed\n";
 static const char *const k_file_created       = "File %s has been created\n";
@@ -99,19 +100,19 @@ static const char *delete_file(const char *const file, int *const status)
   return msg;
 }
 
-int fm_process_request(const int req, const char *const arg)
+int fm_process_request(const int option, const char *const filepath)
 {
   int ret = EX_SOFTWARE;
 
   const char *msg = k_help_message;
 
-  switch (req) {
+  switch (option) {
     case 'c': {
-      msg = create_file(arg, &ret);
+      msg = create_file(filepath, &ret);
       break;
     }
     case 'd': {
-      msg = delete_file(arg, &ret);
+      msg = delete_file(filepath, &ret);
       break;
     }
     case 'h': {
@@ -124,7 +125,7 @@ int fm_process_request(const int req, const char *const arg)
     }
   }
 
-  printf(msg, arg);
+  printf(msg, filepath);
 
   return ret;
 }
