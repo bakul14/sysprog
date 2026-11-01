@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <sysexits.h>
 
+static const char *const k_help_message =
+  "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n";
+
 static const char *const k_msg_created      = "File %s has been created\n";
 static const char *const k_msg_not_created  = "File %s has not been created\n";
 static const char *const k_msg_close_failed = "File %s has been created, but could not be closed\n";

@@ -16,7 +16,4 @@ static const struct option k_fm_long_options[] = {
   // clang-format on
 };
 
-static const char *const k_help_message =
-  "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n";
-
 #endif
