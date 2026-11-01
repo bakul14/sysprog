@@ -5,3 +5,4 @@ linux:
 
 clean:
 	rm -f filemanager compile_commands.json
+	rm -rf .cache
