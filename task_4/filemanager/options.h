@@ -1,6 +1,6 @@
-#ifndef OPTIONS
+#ifndef OPTIONS_H
 
-#define OPTIONS
+#define OPTIONS_H
 
 #include <getopt.h>
 
@@ -15,4 +15,4 @@ static const struct option k_fm_long_options[] = {
 
 };
 
-#endif
+#endif /* OPTIONS_H */
