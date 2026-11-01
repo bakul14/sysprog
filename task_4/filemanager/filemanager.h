@@ -15,7 +15,7 @@
  * @retval EX_OK        Request has been processed successfully.
  * @retval EX_USAGE     Unknown request or missing file path.
  * @retval EX_CANTCREAT File already exists or could not be created.
- * @retval EX_NOINPUT   File could not be deleted.
+ * @retval EX_NOINPUT   File does not exist or could not be deleted.
  * @retval EX_IOERR     File has been created but could not be closed.
  */
 int fm_process_request(const int req, const char *const arg);

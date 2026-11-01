@@ -15,6 +15,7 @@ static const char *const k_file_deleted     = "File %s has been deleted\n";
 static const char *const k_file_exists      = "File %s already exists\n";
 static const char *const k_file_not_created = "File %s has not been created\n";
 static const char *const k_file_not_deleted = "File %s has not been deleted\n";
+static const char *const k_file_not_exists  = "File %s does not exist, nothing to delete\n";
 static const char *const k_no_file_path     = "File path is not specified\n";
 
 static const char *create_file(const char *const file, int *const status)
@@ -48,11 +49,13 @@ static const char *delete_file(const char *const file, int *const status)
   const char *msg = k_no_file_path;
 
   if (NULL != file) {
+    errno = 0;
+
     if (0 == remove(file)) {
       msg     = k_file_deleted;
       *status = EX_OK;
     } else {
-      msg     = k_file_not_deleted;
+      msg     = (ENOENT == errno) ? k_file_not_exists : k_file_not_deleted;
       *status = EX_NOINPUT;
     }
   } else {
