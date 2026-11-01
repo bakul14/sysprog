@@ -36,8 +36,8 @@ static const char *create_file(const char *const file, int *const status)
           *status = EX_CANTCREAT;
           break;
         }
-        case EACCES: /* [[fallthrpugh]] */
-        case EPERM:  /* [[fallthrpugh]] */
+        case EACCES: /* [[fallthrough]] */
+        case EPERM:  /* [[fallthrough]] */
         case EROFS: {
           msg     = k_file_create_denied;
           *status = EX_NOPERM;
@@ -81,8 +81,8 @@ static const char *delete_file(const char *const file, int *const status)
           *status = EX_NOINPUT;
           break;
         }
-        case EACCES: /* [[fallthrpugh]] */
-        case EPERM:  /* [[fallthrpugh]] */
+        case EACCES: /* [[fallthrough]] */
+        case EPERM:  /* [[fallthrough]] */
         case EROFS: {
           msg     = k_file_delete_denied;
           *status = EX_NOPERM;
