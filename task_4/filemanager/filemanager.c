@@ -78,8 +78,12 @@ static const char *delete_file(const char *const file, int *const status)
           *status = EX_NOINPUT;
           break;
         }
-        case EACCES: /* [[fallthrough]] */
-        case EPERM:  /* [[fallthrough]] */
+        case EACCES: {
+          [[fallthrough]];
+        }
+        case EPERM: {
+          [[fallthrough]];
+        }
         case EROFS: {
           msg     = k_file_delete_denied;
           *status = EX_NOPERM;
