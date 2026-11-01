@@ -25,8 +25,6 @@ static const char *create_file(const char *const file, int *const status)
   const char *msg = k_no_file_path;
 
   if (NULL != file) {
-    errno = 0;
-
     FILE *const fp = fopen(file, "wx");
 
     if (NULL == fp) {
@@ -69,8 +67,6 @@ static const char *delete_file(const char *const file, int *const status)
   const char *msg = k_no_file_path;
 
   if (NULL != file) {
-    errno = 0;
-
     if (0 == remove(file)) {
       msg     = k_file_deleted;
       *status = EX_OK;
