@@ -3,17 +3,16 @@
 #define OPTIONS
 
 #include <getopt.h>
-#include <stddef.h>
 
-static const char *const k_fm_short_options = "c:d:h";
+static constexpr char k_fm_short_options[] = "c:d:h";
 
 static const struct option k_fm_long_options[] = {
-  // clang-format off
-  {"create", required_argument, NULL, 'c'},
-  {"delete", required_argument, NULL, 'd'},
-  {"help", no_argument, NULL, 'h'},
-  {NULL, 0, NULL, 0}
-  // clang-format on
+
+  {"create", required_argument, nullptr, 'c'},
+  {"delete", required_argument, nullptr, 'd'},
+  {"help", no_argument, nullptr, 'h'},
+  {nullptr, 0, nullptr, 0}
+
 };
 
 #endif

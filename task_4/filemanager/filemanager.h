@@ -19,6 +19,6 @@
  * @retval EX_NOINPUT   File does not exist or could not be deleted.
  * @retval EX_IOERR     File has been created but could not be closed.
  */
-int fm_process_request(const int option, const char *const filepath);
+[[nodiscard]] int fm_process_request(const int option, const char *const filepath);
 
 #endif /* FILEMANAGER_H */
