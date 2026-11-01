@@ -4,3 +4,4 @@ disk.img
 filemanager
 !filemanager/
 compile_commands.json
+.cache
