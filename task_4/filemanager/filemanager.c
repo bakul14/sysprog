@@ -10,13 +10,15 @@ static const char *const k_help_message =
   "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n";
 static const char *const k_file_close_failed =
   "File %s has been created, but could not be closed\n";
-static const char *const k_file_created     = "File %s has been created\n";
-static const char *const k_file_deleted     = "File %s has been deleted\n";
-static const char *const k_file_exists      = "File %s already exists\n";
-static const char *const k_file_not_created = "File %s has not been created\n";
-static const char *const k_file_not_deleted = "File %s has not been deleted\n";
-static const char *const k_file_not_exists  = "File %s does not exist, nothing to delete\n";
-static const char *const k_no_file_path     = "File path is not specified\n";
+static const char *const k_file_created       = "File %s has been created\n";
+static const char *const k_file_deleted       = "File %s has been deleted\n";
+static const char *const k_file_exists        = "File %s already exists\n";
+static const char *const k_file_not_created   = "File %s has not been created\n";
+static const char *const k_file_not_deleted   = "File %s has not been deleted\n";
+static const char *const k_file_not_exists    = "File %s does not exist, nothing to delete\n";
+static const char *const k_file_create_denied = "File %s has not been created: permission denied\n";
+static const char *const k_file_delete_denied = "File %s has not been deleted: permission denied\n";
+static const char *const k_no_file_path       = "File path is not specified\n";
 
 static const char *create_file(const char *const file, int *const status)
 {
@@ -28,8 +30,25 @@ static const char *create_file(const char *const file, int *const status)
     FILE *const fp = fopen(file, "wx");
 
     if (NULL == fp) {
-      msg     = (EEXIST == errno) ? k_file_exists : k_file_not_created;
-      *status = EX_CANTCREAT;
+      switch (errno) {
+        case EEXIST: {
+          msg     = k_file_exists;
+          *status = EX_CANTCREAT;
+          break;
+        }
+        case EACCES: /* [[fallthrpugh]] */
+        case EPERM:  /* [[fallthrpugh]] */
+        case EROFS: {
+          msg     = k_file_create_denied;
+          *status = EX_NOPERM;
+          break;
+        }
+        default: {
+          msg     = k_file_not_created;
+          *status = EX_CANTCREAT;
+          break;
+        }
+      }
     } else if (0 != fclose(fp)) {
       msg     = k_file_close_failed;
       *status = EX_IOERR;
@@ -37,6 +56,7 @@ static const char *create_file(const char *const file, int *const status)
       msg     = k_file_created;
       *status = EX_OK;
     }
+
   } else {
     *status = EX_USAGE;
   }
@@ -55,9 +75,27 @@ static const char *delete_file(const char *const file, int *const status)
       msg     = k_file_deleted;
       *status = EX_OK;
     } else {
-      msg     = (ENOENT == errno) ? k_file_not_exists : k_file_not_deleted;
-      *status = EX_NOINPUT;
+      switch (errno) {
+        case ENOENT: {
+          msg     = k_file_not_exists;
+          *status = EX_NOINPUT;
+          break;
+        }
+        case EACCES: /* [[fallthrpugh]] */
+        case EPERM:  /* [[fallthrpugh]] */
+        case EROFS: {
+          msg     = k_file_delete_denied;
+          *status = EX_NOPERM;
+          break;
+        }
+        default: {
+          msg     = k_file_not_deleted;
+          *status = EX_NOINPUT;
+          break;
+        }
+      }
     }
+
   } else {
     *status = EX_USAGE;
   }
