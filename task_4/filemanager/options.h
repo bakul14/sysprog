@@ -4,7 +4,7 @@
 
 #include <getopt.h>
 
-static constexpr char k_fm_short_options[] = "c:d:h";
+constexpr char k_fm_short_options[] = "c:d:h";
 
 static const struct option k_fm_long_options[] = {
 

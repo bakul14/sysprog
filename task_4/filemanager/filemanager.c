@@ -1,23 +1,22 @@
 #include "filemanager.h"
-#include "options.h"
 
 #include <errno.h>
 #include <stdio.h>
 #include <sysexits.h>
 
-static constexpr char k_help_message[] =
+constexpr char k_help_message[] =
   "\nA simple file manager that allows to create or delete one file per launch.\n\n"
   "Usage:\n  -c, --create <filename>\n  -d, --delete <filename>\n  -h, --help\n\n";
-static constexpr char k_file_close_failed[] = "File %s has been created, but could not be closed\n";
-static constexpr char k_file_created[]      = "File %s has been created\n";
-static constexpr char k_file_deleted[]      = "File %s has been deleted\n";
-static constexpr char k_file_exists[]       = "File %s already exists\n";
-static constexpr char k_file_not_created[]  = "File %s has not been created\n";
-static constexpr char k_file_not_deleted[]  = "File %s has not been deleted\n";
-static constexpr char k_file_not_exists[]   = "File %s does not exist, nothing to delete\n";
-static constexpr char k_file_create_denied[] = "File %s has not been created: permission denied\n";
-static constexpr char k_file_delete_denied[] = "File %s has not been deleted: permission denied\n";
-static constexpr char k_no_file_path[]       = "File path is not specified\n";
+constexpr char k_file_close_failed[]  = "File %s has been created, but could not be closed\n";
+constexpr char k_file_created[]       = "File %s has been created\n";
+constexpr char k_file_deleted[]       = "File %s has been deleted\n";
+constexpr char k_file_exists[]        = "File %s already exists\n";
+constexpr char k_file_not_created[]   = "File %s has not been created\n";
+constexpr char k_file_not_deleted[]   = "File %s has not been deleted\n";
+constexpr char k_file_not_exists[]    = "File %s does not exist, nothing to delete\n";
+constexpr char k_file_create_denied[] = "File %s has not been created: permission denied\n";
+constexpr char k_file_delete_denied[] = "File %s has not been deleted: permission denied\n";
+constexpr char k_no_file_path[]       = "File path is not specified\n";
 
 static const char *create_file(const char *const filepath, int *const status)
 {
