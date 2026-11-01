@@ -1,6 +1,21 @@
 {
   "languages": {
+    
     "C++": {
+      "formatter": {
+        "external": {
+          "command": "clang-format",
+          "arguments": [
+            "--assume-filename={buffer_path}"
+          ]
+        }
+      }
+    },
+    
+    "C": {
+      "language_servers": [
+        "clangd"
+      ],
       "formatter": {
         "external": {
           "command": "clang-format",

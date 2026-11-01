@@ -1,5 +1,7 @@
+.PHONY: linux clean
+
 linux:
-	gcc -std=c23 -Wall -Wextra -pedantic filemanager.c main.c -o filemanager
+	bear -- gcc -std=c23 -Wall -Wextra -pedantic filemanager.c main.c -o filemanager
 
 clean:
-	rm -f filemanager
+	rm -f filemanager compile_commands.json
