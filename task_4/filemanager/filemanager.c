@@ -24,39 +24,21 @@ static const char *create_file(const char *const filepath, int *const status)
 
   if (nullptr != filepath) {
     FILE *const fp = fopen(filepath, "wx");
-
-    if (nullptr == fp) {
-      switch (errno) {
-        case EEXIST: {
-          msg     = k_file_exists;
-          *status = EX_CANTCREAT;
-          break;
-        }
-        case EACCES: {
-          [[fallthrough]];
-        }
-        case EPERM: {
-          [[fallthrough]];
-        }
-        case EROFS: {
-          msg     = k_file_create_denied;
-          *status = EX_NOPERM;
-          break;
-        }
-        default: {
-          msg     = k_file_not_created;
-          *status = EX_CANTCREAT;
-          break;
-        }
-      }
-    } else if (0 != fclose(fp)) {
-      msg     = k_file_close_failed;
-      *status = EX_IOERR;
+    if (nullptr != fp) {
+      const int close_result = fclose(fp);
+      msg                    = (0 == close_result) ? k_file_created : k_file_close_failed;
+      *status                = (0 == close_result) ? EX_OK : EX_IOERR;
     } else {
-      msg     = k_file_created;
-      *status = EX_OK;
+      // clang-format off
+        switch (errno) {
+          case EEXIST: { msg = k_file_exists;        *status = EX_CANTCREAT; break; }
+          case EACCES: { [[fallthrough]]; }
+          case EPERM:  { [[fallthrough]]; }
+          case EROFS:  { msg = k_file_create_denied; *status = EX_NOPERM;    break; }
+          default:     { msg = k_file_not_created;   *status = EX_CANTCREAT; break; }
+        }
+      // clang-format on
     }
-
   } else {
     *status = EX_USAGE;
   }
@@ -73,31 +55,16 @@ static const char *delete_file(const char *const filepath, int *const status)
       msg     = k_file_deleted;
       *status = EX_OK;
     } else {
+      // clang-format off
       switch (errno) {
-        case ENOENT: {
-          msg     = k_file_not_exists;
-          *status = EX_NOINPUT;
-          break;
-        }
-        case EACCES: {
-          [[fallthrough]];
-        }
-        case EPERM: {
-          [[fallthrough]];
-        }
-        case EROFS: {
-          msg     = k_file_delete_denied;
-          *status = EX_NOPERM;
-          break;
-        }
-        default: {
-          msg     = k_file_not_deleted;
-          *status = EX_NOINPUT;
-          break;
-        }
+        case ENOENT: { msg = k_file_not_exists;    *status = EX_NOINPUT; break; }
+        case EACCES: { [[fallthrough]]; }
+        case EPERM:  { [[fallthrough]]; }
+        case EROFS:  { msg = k_file_delete_denied; *status = EX_NOPERM;  break; }
+        default:     { msg = k_file_not_deleted;   *status = EX_NOINPUT; break; }
       }
+      // clang-firmat on
     }
-
   } else {
     *status = EX_USAGE;
   }
@@ -107,30 +74,16 @@ static const char *delete_file(const char *const filepath, int *const status)
 
 int fm_process_request(const int option, const char *const filepath)
 {
-  int ret = EX_SOFTWARE;
-
+  int ret         = EX_SOFTWARE;
   const char *msg = k_help_message;
-
+  // clang-format off
   switch (option) {
-    case 'c': {
-      msg = create_file(filepath, &ret);
-      break;
-    }
-    case 'd': {
-      msg = delete_file(filepath, &ret);
-      break;
-    }
-    case 'h': {
-      ret = EX_OK;
-      break;
-    }
-    default: {
-      ret = EX_USAGE;
-      break;
-    }
+    case 'c': { msg = create_file(filepath, &ret); break; }
+    case 'd': { msg = delete_file(filepath, &ret); break; }
+    case 'h': { ret = EX_OK;                       break; }
+    default:  { ret = EX_USAGE;                    break; }
   }
-
+  // clang-foramt on
   printf(msg, filepath);
-
   return ret;
 }
