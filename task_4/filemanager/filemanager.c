@@ -63,7 +63,7 @@ static const char *delete_file(const char *const filepath, int *const status)
         case EROFS:  { msg = k_file_delete_denied; *status = EX_NOPERM;  break; }
         default:     { msg = k_file_not_deleted;   *status = EX_NOINPUT; break; }
       }
-      // clang-firmat on
+      // clang-format on
     }
   } else {
     *status = EX_USAGE;
@@ -74,16 +74,18 @@ static const char *delete_file(const char *const filepath, int *const status)
 
 int fm_process_request(const int option, const char *const filepath)
 {
-  int ret         = EX_SOFTWARE;
-  const char *msg = k_help_message;
+  int ret = EX_SOFTWARE;
+
+  const char *msg = nullptr;
   // clang-format off
   switch (option) {
-    case 'c': { msg = create_file(filepath, &ret); break; }
-    case 'd': { msg = delete_file(filepath, &ret); break; }
-    case 'h': { ret = EX_OK;                       break; }
-    default:  { ret = EX_USAGE;                    break; }
+    case 'c': { msg = create_file(filepath, &ret);           break; }
+    case 'd': { msg = delete_file(filepath, &ret);           break; }
+    case 'h': { msg = k_help_message;        ret = EX_OK;    break; }
+    default:  { msg = k_help_message;        ret = EX_USAGE; break; }
   }
-  // clang-foramt on
+  // clang-format on
   printf(msg, filepath);
+
   return ret;
 }
