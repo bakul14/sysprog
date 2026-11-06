@@ -1,5 +1,6 @@
 backups/
 *.out
+*.o
 disk.img
 filemanager
 !filemanager/
