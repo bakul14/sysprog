@@ -8,5 +8,5 @@ clean:
 	rm -f filemanager *.o
 
 distclean: clean
-	rm compile_commands.json
+	rm -f compile_commands.json
 	rm -rf .cache
