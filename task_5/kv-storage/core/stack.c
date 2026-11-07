@@ -8,11 +8,11 @@ static inline bool double_stack_(Stack_t *const stack)
 {
   bool ret = false;
 
-  void *const new_stack_ptr = realloc((void *const)(stack->cell), (stack->size_) * 2);
+  void *const new_stack_ptr = realloc((void *const)(stack->cell), (stack->size_) * 2U);
 
   if (nullptr != new_stack_ptr) {
     stack->cell  = new_stack_ptr;
-    stack->size_ = stack->size_ * 2;
+    stack->size_ = stack->size_ * 2U;
     ret          = true;
   }
 
