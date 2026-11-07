@@ -1,7 +1,15 @@
 .PHONY: linux clean distclean
 
 TARGET = kv-storage
-	
+
+ARGS = \
+	-std=c23 \
+	-O2 \
+	-Wall \
+	-Wextra \
+	-Wpedantic \
+	-Werror
+
 INCLUDES = \
 	-Iembedded-cli/lib/include/
 
@@ -11,7 +19,7 @@ SOURCES = \
 	embedded-cli/lib/src/embedded_cli.c
 	
 linux:
-	bear -- cc -std=c23 -O2 -Wall -Wextra -Wpedantic -Werror -c $(SOURCES) $(INCLUDES)
+	bear -- cc $(ARGS) -c $(SOURCES) $(INCLUDES)
 	cc $(notdir $(SOURCES:.c=.o)) -o $(TARGET)
 
 clean:
