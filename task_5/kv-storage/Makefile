@@ -7,6 +7,7 @@ INCLUDES = \
 
 SOURCES = \
 	main.c \
+	core/stack.c \
 	embedded-cli/lib/src/embedded_cli.c
 	
 linux:

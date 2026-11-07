@@ -18,14 +18,10 @@ typedef struct List {
 } List;
 
 inline List *create_list()
-{
-  return (List *)malloc(sizeof(List));
-}
+{ return (List *)malloc(sizeof(List)); }
 
 inline void delete_list(List *const list)
-{
-  free(list);
-}
+{ free(list); }
 
 inline bool push_front(List *const list, Node *const node)
 {
