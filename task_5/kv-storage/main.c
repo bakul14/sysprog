@@ -31,5 +31,7 @@ int main(int argc, char *argv[])
     printf("pop result = %d,  value = %s\n", (int)pop(&stack, &cell_tmp), (char *)cell_tmp.data);
   }
 
+  deinit(&stack);
+
   return 0;
 }

@@ -36,6 +36,11 @@ bool init(Stack_t *const stack)
   return ret;
 }
 
+void deinit(Stack_t *const stack)
+{
+  free(stack->cell);
+}
+
 bool push(Stack_t *const stack, const Cell_t cell)
 {
   bool ret = false;

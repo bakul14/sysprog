@@ -16,6 +16,8 @@ typedef struct Stack {
 
 bool init(Stack_t *const stack);
 
+void deinit(Stack_t *const stack);
+
 bool push(Stack_t *const stack, const Cell_t cell);
 
 bool pop(Stack_t *const stack, Cell_t *const cell);
