@@ -19,7 +19,7 @@ static inline bool double_stack_(Stack_t *const stack)
   return ret;
 }
 
-bool init(Stack_t *const stack)
+bool stack_init(Stack_t *const stack)
 {
   bool ret = false;
 
@@ -36,13 +36,13 @@ bool init(Stack_t *const stack)
   return ret;
 }
 
-void deinit(Stack_t *const stack)
+void stack_deinit(Stack_t *const stack)
 {
   for (size_t i = 0U; i < stack->used_; ++i) { free((void *)(stack->cell->data)); }
   free(stack->cell);
 }
 
-bool push(Stack_t *const stack, const Cell_t cell)
+bool stack_push(Stack_t *const stack, const Cell_t cell)
 {
   bool ret = false;
 
@@ -59,7 +59,7 @@ bool push(Stack_t *const stack, const Cell_t cell)
   return ret;
 }
 
-bool pop(Stack_t *const stack, Cell_t *const cell)
+bool stack_pop(Stack_t *const stack, Cell_t *const cell)
 {
   bool ret = false;
 

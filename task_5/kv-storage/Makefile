@@ -14,9 +14,10 @@ INCLUDES = \
 	-Iembedded-cli/lib/include/
 
 SOURCES = \
+	cli/cli.c \
 	main.c \
-	core/stack.c \
-	embedded-cli/lib/src/embedded_cli.c
+	embedded-cli/lib/src/embedded_cli.c \
+	core/stack.c
 	
 linux:
 	bear -- cc $(ARGS) -c $(SOURCES) $(INCLUDES)

@@ -14,12 +14,12 @@ typedef struct Stack {
   size_t used_;
 } Stack_t;
 
-bool init(Stack_t *const stack);
+bool stack_init(Stack_t *const stack);
 
-void deinit(Stack_t *const stack);
+void stack_deinit(Stack_t *const stack);
 
-bool push(Stack_t *const stack, const Cell_t cell);
+bool stack_push(Stack_t *const stack, const Cell_t cell);
 
-bool pop(Stack_t *const stack, Cell_t *const cell);
+bool stack_pop(Stack_t *const stack, Cell_t *const cell);
 
 #endif

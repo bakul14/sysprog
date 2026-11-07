@@ -1,5 +1,7 @@
 #include "core/stack.h"
 
+#include "cli/cli.h"
+
 #include <stdio.h>
 
 constexpr char test_message_1[] = "test_message_1";
@@ -12,7 +14,7 @@ int main(int argc, char *argv[])
   (void)argv;
 
   Stack_t stack = {};
-  if (init(&stack)) {
+  if (stack_init(&stack)) {
     printf("Stack has been inited\n");
   } else {
     printf("Stack has not been inited\n");
@@ -22,16 +24,25 @@ int main(int argc, char *argv[])
   const Cell_t cell_2 = {.data = (void *)test_message_2};
   const Cell_t cell_3 = {.data = (void *)test_message_3};
 
-  printf("push result = %d, value = %s\n", (int)push(&stack, cell_1), test_message_1);
-  printf("push result = %d, value = %s\n", (int)push(&stack, cell_2), test_message_2);
-  printf("push result = %d, value = %s\n", (int)push(&stack, cell_3), test_message_3);
+  printf("push result = %d, value = %s\n", (int)stack_push(&stack, cell_1), test_message_1);
+  printf("push result = %d, value = %s\n", (int)stack_push(&stack, cell_2), test_message_2);
+  printf("push result = %d, value = %s\n", (int)stack_push(&stack, cell_3), test_message_3);
 
   for (int i = 0; i < 3; ++i) {
     Cell_t cell_tmp;
-    printf("pop result = %d,  value = %s\n", (int)pop(&stack, &cell_tmp), (char *)cell_tmp.data);
+    printf(
+      "pop result = %d,  value = %s\n", (int)stack_pop(&stack, &cell_tmp), (char *)cell_tmp.data);
   }
 
-  deinit(&stack);
+  stack_deinit(&stack);
+
+  Cli_t cli = {};
+  if (cli_init(&cli)) {
+    printf("Командная строка успешно инициализирована\n");
+    for (;;) { cli_process(&cli); }
+  } else {
+    printf("Ошибка инициализации командной строки\n");
+  }
 
   return 0;
 }
