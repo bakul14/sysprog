@@ -1,3 +1,8 @@
 backups/
 *.out
+*.o
 disk.img
+filemanager
+!filemanager/
+compile_commands.json
+.cache
