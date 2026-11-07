@@ -38,6 +38,7 @@ bool init(Stack_t *const stack)
 
 void deinit(Stack_t *const stack)
 {
+  for (size_t i = 0U; i < stack->used_; ++i) { free((void *)(stack->cell->data)); }
   free(stack->cell);
 }
 
