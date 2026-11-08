@@ -3,7 +3,7 @@
 TARGET = kv-storage
 
 ARGS = \
-	-std=c23 \
+	-std=gnu23 \
 	-O2 \
 	-Wall \
 	-Wextra \
