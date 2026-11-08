@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct Cell {
+  void *data;
+  size_t size;
+} Cell_t;
+
 typedef struct Stack {
   Cell_t *cell;
   size_t size;
@@ -58,20 +63,20 @@ void stack_deinit(Stack_t *const stack_ptr)
   }
 }
 
-bool stack_push(Stack_t *const stack, const Cell_t cell)
+bool stack_push(Stack_t *const stack, const void *const data, const size_t size)
 {
   bool ret = false;
 
-  if ((nullptr != stack) && (nullptr != cell.data) && (cell.size > 0U)) {
+  if ((nullptr != stack) && (nullptr != data) && (size > 0U)) {
     const bool stack_has_free_space = (stack->size > stack->used) || double_stack_(stack);
 
     if (stack_has_free_space) {
-      void *const data_copy = malloc(cell.size);
+      void *const data_copy = malloc(size);
 
       if (nullptr != data_copy) {
-        memcpy(data_copy, cell.data, cell.size);
+        memcpy(data_copy, data, size);
         stack->cell[stack->used].data = data_copy;
-        stack->cell[stack->used].size = cell.size;
+        stack->cell[stack->used].size = size;
         ++(stack->used);
         ret = true;
       }
@@ -81,28 +86,30 @@ bool stack_push(Stack_t *const stack, const Cell_t cell)
   return ret;
 }
 
-Cell_t stack_pop(Stack_t *const stack)
+bool stack_pop(Stack_t *const stack, void **const data, size_t *const size)
 {
-  Cell_t cell = {.data = nullptr, .size = 0U};
+  bool ret = false;
 
-  if (nullptr != stack) {
+  if ((nullptr != stack) && (nullptr != data) && (nullptr != size)) {
     const bool stack_is_not_empty = stack->used > 0U;
 
     if (stack_is_not_empty) {
-      cell                          = stack->cell[stack->used - 1U];
+      const Cell_t cell             = stack->cell[stack->used - 1U];
       stack->cell[stack->used - 1U] = (Cell_t){.data = nullptr, .size = 0U};
       --(stack->used);
+      *data = cell.data;
+      *size = cell.size;
+      ret   = true;
     }
   }
 
-  return cell;
+  return ret;
 }
 
-void stack_cell_free(Cell_t *const cell)
+void stack_data_free(void **const data)
 {
-  if (nullptr != cell) {
-    free(cell->data);
-    cell->data = nullptr;
-    cell->size = 0U;
+  if (nullptr != data) {
+    free(*data);
+    *data = nullptr;
   }
 }

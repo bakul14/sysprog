@@ -6,19 +6,14 @@
 
 typedef struct Stack Stack_t;
 
-typedef struct Cell {
-  void *data;
-  size_t size;
-} Cell_t;
-
 Stack_t *stack_init();
 
 void stack_deinit(Stack_t *const stack_ptr);
 
-bool stack_push(Stack_t *const stack, const Cell_t cell);
+bool stack_push(Stack_t *const stack, const void *const data, const size_t size);
 
-Cell_t stack_pop(Stack_t *const stack);
+bool stack_pop(Stack_t *const stack, void **const data, size_t *const size);
 
-void stack_cell_free(Cell_t *const cell);
+void stack_data_free(void **const data);
 
 #endif
