@@ -13,13 +13,12 @@ typedef struct Cell {
 
 Stack_t *stack_init();
 
-void stack_deinit(Stack_t *stack_ptr);
+void stack_deinit(Stack_t *const stack_ptr);
 
-bool stack_push(Stack_t *stack, Cell_t cell);
+bool stack_push(Stack_t *const stack, const Cell_t cell);
 
-/* Ownership of the returned cell.data passes to the caller; release it with stack_cell_free(). */
-Cell_t stack_pop(Stack_t *stack);
+Cell_t stack_pop(Stack_t *const stack);
 
-void stack_cell_free(Cell_t *cell);
+void stack_cell_free(Cell_t *const cell);
 
 #endif

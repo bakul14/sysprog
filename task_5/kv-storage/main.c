@@ -8,12 +8,12 @@ constexpr char test_message_1[] = "test_message_1";
 constexpr char test_message_2[] = "test_message_2";
 constexpr char test_message_3[] = "test_message_3";
 
-int main(int argc, char *argv[])
+int main(const int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
 
-  Stack_t *stack = stack_init();
+  Stack_t *const stack = stack_init();
 
   if (nullptr != stack) {
     printf("Stack has been inited\n");
