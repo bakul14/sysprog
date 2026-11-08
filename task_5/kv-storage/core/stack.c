@@ -42,6 +42,7 @@ Stack_t *stack_init()
       stack_ptr->used = 0U;
     } else {
       free(stack_ptr);
+      stack_ptr = nullptr;
     }
   }
 
@@ -50,9 +51,11 @@ Stack_t *stack_init()
 
 void stack_deinit(Stack_t *stack_ptr)
 {
-  for (size_t i = 0U; i < stack_ptr->used; ++i) { free((void *)(stack_ptr->cell[i].data)); }
-  free(stack_ptr->cell);
-  free(stack_ptr);
+  if (nullptr != stack_ptr) {
+    for (size_t i = 0U; i < stack_ptr->used; ++i) { free((void *)(stack_ptr->cell[i].data)); }
+    free(stack_ptr->cell);
+    free(stack_ptr);
+  }
 }
 
 bool stack_push(Stack_t *stack, Cell_t cell)
@@ -93,4 +96,13 @@ Cell_t stack_pop(Stack_t *stack)
   }
 
   return cell;
+}
+
+void stack_cell_free(Cell_t *cell)
+{
+  if (nullptr != cell) {
+    free(cell->data);
+    cell->data = nullptr;
+    cell->size = 0U;
+  }
 }

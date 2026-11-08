@@ -17,6 +17,9 @@ void stack_deinit(Stack_t *stack_ptr);
 
 bool stack_push(Stack_t *stack, Cell_t cell);
 
+/* Ownership of the returned cell.data passes to the caller; release it with stack_cell_free(). */
 Cell_t stack_pop(Stack_t *stack);
+
+void stack_cell_free(Cell_t *cell);
 
 #endif

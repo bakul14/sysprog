@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
   for (int i = 0; i < 3; ++i) {
     Cell_t cell = stack_pop(stack);
     printf("pop report: size = %d, value = %s\n", (int)cell.size, (char *)cell.data);
+    stack_cell_free(&cell);
   }
 
   stack_deinit(stack);
