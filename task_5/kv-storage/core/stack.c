@@ -3,75 +3,94 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
+
+typedef struct Stack {
+  Cell_t *cell;
+  size_t size;
+  size_t used;
+} Stack_t;
 
 static inline bool double_stack_(Stack_t *const stack)
 {
   bool ret = false;
 
-  void *const new_stack_ptr = realloc((void *const)(stack->cell), (stack->size_) * 2U);
+  void *const new_stack_ptr =
+    realloc((void *const)(stack->cell), (stack->size) * sizeof(Cell_t) * 2U);
 
   if (nullptr != new_stack_ptr) {
-    stack->cell  = new_stack_ptr;
-    stack->size_ = stack->size_ * 2U;
-    ret          = true;
+    stack->cell = new_stack_ptr;
+    stack->size = stack->size * 2U;
+    ret         = true;
   }
 
   return ret;
 }
 
-bool stack_init(Stack_t *const stack)
+Stack_t *stack_init()
 {
-  bool ret = false;
+  Stack_t *stack_ptr = malloc(sizeof(Stack_t));
 
-  constexpr size_t k_initial_stack_depth = 64U;
+  if (nullptr != stack_ptr) {
+    constexpr size_t k_initial_stack_depth = 64U;
 
-  Cell_t *const stack_area = (Cell_t *const)calloc(k_initial_stack_depth, sizeof(Cell_t));
-  if (nullptr != stack_area) {
-    stack->cell  = stack_area;
-    stack->size_ = k_initial_stack_depth;
-    stack->used_ = 0U;
-    ret          = true;
+    Cell_t *const cell_area_ptr = (Cell_t *const)malloc(k_initial_stack_depth * sizeof(Cell_t));
+
+    if (nullptr != cell_area_ptr) {
+      stack_ptr->cell = cell_area_ptr;
+      stack_ptr->size = k_initial_stack_depth;
+      stack_ptr->used = 0U;
+    } else {
+      free(stack_ptr);
+    }
   }
 
-  return ret;
+  return stack_ptr;
 }
 
-void stack_deinit(Stack_t *const stack)
+void stack_deinit(Stack_t *stack_ptr)
 {
-  for (size_t i = 0U; i < stack->used_; ++i) { free((void *)(stack->cell->data)); }
-  free(stack->cell);
+  for (size_t i = 0U; i < stack_ptr->used; ++i) { free((void *)(stack_ptr->cell[i].data)); }
+  free(stack_ptr->cell);
+  free(stack_ptr);
 }
 
-bool stack_push(Stack_t *const stack, const Cell_t cell)
+bool stack_push(Stack_t *stack, Cell_t cell)
 {
   bool ret = false;
 
-  if (nullptr != stack) {
-    const bool stack_has_free_space = (stack->size_ > stack->used_) || double_stack_(stack);
+  if ((nullptr != stack) && (nullptr != cell.data) && (cell.size > 0U)) {
+    const bool stack_has_free_space = (stack->size > stack->used) || double_stack_(stack);
 
     if (stack_has_free_space) {
-      stack->cell[stack->used_] = cell;
-      ++(stack->used_);
-      ret = true;
+      void *const data_copy = malloc(cell.size);
+
+      if (nullptr != data_copy) {
+        memcpy(data_copy, cell.data, cell.size);
+        stack->cell[stack->used].data = data_copy;
+        stack->cell[stack->used].size = cell.size;
+        ++(stack->used);
+        ret = true;
+      }
     }
   }
 
   return ret;
 }
 
-bool stack_pop(Stack_t *const stack, Cell_t *const cell)
+Cell_t stack_pop(Stack_t *stack)
 {
-  bool ret = false;
+  Cell_t cell = {.data = nullptr, .size = 0U};
 
   if (nullptr != stack) {
-    const bool stack_is_not_empty = stack->used_ > 0U;
+    const bool stack_is_not_empty = stack->used > 0U;
 
     if (stack_is_not_empty) {
-      *cell = stack->cell[stack->used_ - 1U];
-      --(stack->used_);
-      ret = true;
+      cell                          = stack->cell[stack->used - 1U];
+      stack->cell[stack->used - 1U] = (Cell_t){.data = nullptr, .size = 0U};
+      --(stack->used);
     }
   }
 
-  return ret;
+  return cell;
 }

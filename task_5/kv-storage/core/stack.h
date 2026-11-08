@@ -4,22 +4,19 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+typedef struct Stack Stack_t;
+
 typedef struct Cell {
-  const void *data;
+  void *data;
+  size_t size;
 } Cell_t;
 
-typedef struct Stack {
-  Cell_t *cell;
-  size_t size_;
-  size_t used_;
-} Stack_t;
+Stack_t *stack_init();
 
-bool stack_init(Stack_t *const stack);
+void stack_deinit(Stack_t *stack_ptr);
 
-void stack_deinit(Stack_t *const stack);
+bool stack_push(Stack_t *stack, Cell_t cell);
 
-bool stack_push(Stack_t *const stack, const Cell_t cell);
-
-bool stack_pop(Stack_t *const stack, Cell_t *const cell);
+Cell_t stack_pop(Stack_t *stack);
 
 #endif
