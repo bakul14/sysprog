@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int main(const int argc, char *argv[])
 {
@@ -20,7 +21,7 @@ int main(const int argc, char *argv[])
   init_status = init_status && cli_init(&k_stack_command_map, stack);
 
   if (init_status) {
-    while (cli_process()) {}
+    while (cli_process()) { usleep(10000U); }
     ret = EXIT_SUCCESS;
   } else {
     fputs("Application has not been inited\n", stderr);
