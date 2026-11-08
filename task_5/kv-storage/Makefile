@@ -11,13 +11,13 @@ ARGS = \
 	-Werror
 
 INCLUDES = \
-	-Iembedded-cli/lib/include/
+	-Icli/embedded-cli/lib/include/
 
 SOURCES = \
 	cli/cli.c \
-	main.c \
-	embedded-cli/lib/src/embedded_cli.c \
-	core/stack.c
+	cli/embedded-cli/lib/src/embedded_cli.c \
+	core/stack.c \
+	main.c
 	
 linux:
 	bear -- cc $(ARGS) -c $(SOURCES) $(INCLUDES)

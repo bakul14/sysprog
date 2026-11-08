@@ -2,5 +2,5 @@
 	path = task_4/linux
 	url = git@github.com:torvalds/linux.git
 [submodule "task_5/kv-storage/embedded-cli"]
-	path = task_5/kv-storage/embedded-cli
+	path = task_5/kv-storage/cli/embedded-cli
 	url = https://github.com/funbiscuit/embedded-cli.git
