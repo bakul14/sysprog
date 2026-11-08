@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE /* It is used to compile cfmakeraw() */
+
 #include "cli.h"
 
 #include "embedded_cli.h"
@@ -31,7 +33,7 @@ bool cli_init(Cli_t *const cli)
     struct termios raw_stdin;
     tcgetattr(STDIN_FILENO, &original_stdin_);
     raw_stdin = original_stdin_;
-    // cfmakeraw(&raw_stdin); не компилируется
+    cfmakeraw(&raw_stdin);
     tcsetattr(STDIN_FILENO, TCSANOW, &raw_stdin);
     ret = true;
   }
