@@ -22,8 +22,8 @@ typedef struct CliCommandMap {
 
 bool cli_init(const CliCommandMap_t *const map, void *const context);
 
-bool cli_process(void);
+bool cli_process();
 
-void cli_deinit(void);
+void cli_deinit();
 
 #endif

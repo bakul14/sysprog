@@ -38,9 +38,7 @@ static void write_char(EmbeddedCli *const cli, const char c)
 }
 
 static void print_(const char *const string)
-{
-  embeddedCliPrint(embedded_cli_, string);
-}
+{ embeddedCliPrint(embedded_cli_, string); }
 
 static void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_context)
 {
@@ -70,7 +68,7 @@ static void on_exit_(EmbeddedCli *const cli, char *const args, void *const conte
   is_running_ = false;
 }
 
-static bool add_exit_command_(void)
+static bool add_exit_command_()
 {
   const CliCommandBinding binding = {
     .name         = "exit",
@@ -82,7 +80,7 @@ static bool add_exit_command_(void)
   return embeddedCliAddBinding(embedded_cli_, binding);
 }
 
-static void enable_raw_mode_(void)
+static void enable_raw_mode_()
 {
   if (0 == tcgetattr(STDIN_FILENO, &original_stdin_)) {
     struct termios raw_stdin = original_stdin_;
@@ -91,7 +89,7 @@ static void enable_raw_mode_(void)
   }
 }
 
-static bool backend_init_(void)
+static bool backend_init_()
 {
   bool ret = false;
 
@@ -153,7 +151,7 @@ bool cli_init(const CliCommandMap_t *const map, void *const context)
   return ret;
 }
 
-void cli_deinit(void)
+void cli_deinit()
 {
   if (is_raw_mode_) {
     (void)tcsetattr(STDIN_FILENO, TCSANOW, &original_stdin_);
@@ -169,7 +167,7 @@ void cli_deinit(void)
   is_running_   = false;
 }
 
-bool cli_process(void)
+bool cli_process()
 {
   bool ret = false;
   char c   = '\0';
