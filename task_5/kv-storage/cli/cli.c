@@ -38,7 +38,9 @@ static void write_char(EmbeddedCli *const cli, const char c)
 }
 
 static void print_(const char *const string)
-{ embeddedCliPrint(embedded_cli_, string); }
+{
+  embeddedCliPrint(embedded_cli_, string);
+}
 
 static void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_context)
 {
@@ -96,6 +98,7 @@ static bool backend_init_()
   if (nullptr == embedded_cli_) {
     EmbeddedCliConfig *const config = embeddedCliDefaultConfig();
     config->maxBindingCount         = (uint16_t)(k_max_commands + 1U); /* +1 for exit */
+    config->cmdBufferSize           = 256U;
 
     embedded_cli_ = embeddedCliNew(config);
 
