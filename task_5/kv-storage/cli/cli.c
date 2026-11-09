@@ -14,14 +14,9 @@ constexpr size_t k_max_args     = 8U;
 
 static EmbeddedCli *embedded_cli_ = nullptr;
 
-typedef struct Binding {
-  ArgCallbackPair_t command;
-  void *context;
-} Binding_t;
+static CliCallback_t callbacks_[k_max_commands] = {};
 
-static Binding_t bindings_[k_max_commands] = {};
-
-static size_t bindings_num_ = 0U;
+static void *context_ = nullptr;
 
 static struct termios original_stdin_ = {};
 
@@ -32,8 +27,8 @@ static bool is_running_ = false;
 static void write_char(EmbeddedCli *const cli, const char c)
 {
   (void)cli;
-  size_t null = 0U;
-  null        = write(STDOUT_FILENO, &c, 1);
+  ssize_t null = 0U;
+  null         = write(STDOUT_FILENO, &c, 1);
   (void)null;
 }
 
@@ -42,12 +37,12 @@ static void print_(const char *const string)
   embeddedCliPrint(embedded_cli_, string);
 }
 
-static void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_context)
+static void on_binding_(EmbeddedCli *const cli, char *const args, void *const callback_ptr)
 {
   (void)cli;
 
-  const Binding_t *const binding = binding_context;
-  const size_t token_count       = embeddedCliGetTokenCount(args);
+  const CliCallback_t *const callback = callback_ptr;
+  const size_t token_count            = embeddedCliGetTokenCount(args);
 
   if (token_count <= k_max_args) {
     const char *argv[k_max_args] = {};
@@ -56,7 +51,7 @@ static void on_binding_(EmbeddedCli *const cli, char *const args, void *const bi
       argv[i] = embeddedCliGetToken(args, (uint16_t)(i + 1U));
     }
 
-    binding->command.callback(binding->context, token_count, argv, print_);
+    (*callback)(context_, token_count, argv, print_);
   } else {
     print_("Too many arguments");
   }
@@ -120,26 +115,24 @@ static bool backend_init_()
 
 static bool add_commands_(const CliCommandMap_t *const map, void *const context)
 {
-  bool ret = (nullptr != embedded_cli_) && (nullptr != map) && (nullptr != map->arg_callback) &&
-             (map->num <= (k_max_commands - bindings_num_));
+  bool ret = (nullptr != map) && (nullptr != map->arg_callback) && (map->num <= k_max_commands);
+
+  context_ = context;
 
   for (size_t i = 0U; ret && (i < map->num); ++i) {
-    Binding_t *const binding = &bindings_[bindings_num_];
+    const ArgCallbackPair_t *const command = &map->arg_callback[i];
 
-    binding->command = map->arg_callback[i];
-    binding->context = context;
+    callbacks_[i] = command->callback;
 
-    const CliCommandBinding lib_binding = {
-      .name         = binding->command.arg,
-      .help         = binding->command.help,
+    const CliCommandBinding binding = {
+      .name         = command->arg,
+      .help         = command->help,
       .tokenizeArgs = true,
-      .context      = binding,
+      .context      = &callbacks_[i],
       .binding      = on_binding_};
 
-    ret = (nullptr != binding->command.arg) && (nullptr != binding->command.callback) &&
-          embeddedCliAddBinding(embedded_cli_, lib_binding);
-
-    if (ret) { ++bindings_num_; }
+    ret = (nullptr != command->arg) && (nullptr != command->callback) &&
+          embeddedCliAddBinding(embedded_cli_, binding);
   }
 
   return ret;
@@ -166,16 +159,16 @@ void cli_deinit()
     embedded_cli_ = nullptr;
   }
 
-  bindings_num_ = 0U;
-  is_running_   = false;
+  context_    = nullptr;
+  is_running_ = false;
 }
 
 bool cli_process()
 {
   bool ret = false;
+  
   char c   = '\0';
-
-  if ((nullptr != embedded_cli_) && is_running_ && (read(STDIN_FILENO, &c, 1) > 0)) {
+  if (is_running_ && (read(STDIN_FILENO, &c, 1) > 0)) {
     embeddedCliReceiveChar(embedded_cli_, c);
     embeddedCliProcess(embedded_cli_);
     ret = true;
