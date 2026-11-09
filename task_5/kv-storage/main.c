@@ -22,7 +22,7 @@ int main(const int argc, char *argv[])
   init_status = init_status && cli_init(&k_stack_command_map, stack);
 
   if (init_status) {
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = 10000000};
+    const struct timespec ts = {.tv_sec = 0, .tv_nsec = 10000000};
     while (cli_process()) { nanosleep(&ts, nullptr); }
     ret = EXIT_SUCCESS;
   } else {
