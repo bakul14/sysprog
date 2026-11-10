@@ -8,7 +8,7 @@ typedef struct Stack Stack_t;
 
 Stack_t *stack_init();
 
-void stack_deinit(Stack_t *const stack_ptr);
+void stack_deinit(Stack_t *const stack);
 
 bool stack_push(Stack_t *const stack, const void *const data, const size_t size);
 

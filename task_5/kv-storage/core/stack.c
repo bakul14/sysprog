@@ -20,11 +20,10 @@ static inline bool double_stack_(Stack_t *const stack)
 {
   bool ret = false;
 
-  void *const new_stack_ptr =
-    realloc((void *const)(stack->cell), (stack->size) * sizeof(Cell_t) * 2U);
+  void *const new_stack = realloc((void *const)(stack->cell), (stack->size) * sizeof(Cell_t) * 2U);
 
-  if (nullptr != new_stack_ptr) {
-    stack->cell = new_stack_ptr;
+  if (nullptr != new_stack) {
+    stack->cell = new_stack;
     stack->size = stack->size * 2U;
     ret         = true;
   }
@@ -34,32 +33,32 @@ static inline bool double_stack_(Stack_t *const stack)
 
 Stack_t *stack_init()
 {
-  Stack_t *stack_ptr = malloc(sizeof(Stack_t));
+  Stack_t *stack = malloc(sizeof(Stack_t));
 
-  if (nullptr != stack_ptr) {
+  if (nullptr != stack) {
     constexpr size_t k_initial_stack_depth = 64U;
 
-    Cell_t *const cell_area_ptr = (Cell_t *const)malloc(k_initial_stack_depth * sizeof(Cell_t));
+    Cell_t *const cell_area = (Cell_t *const)malloc(k_initial_stack_depth * sizeof(Cell_t));
 
-    if (nullptr != cell_area_ptr) {
-      stack_ptr->cell = cell_area_ptr;
-      stack_ptr->size = k_initial_stack_depth;
-      stack_ptr->used = 0U;
+    if (nullptr != cell_area) {
+      stack->cell = cell_area;
+      stack->size = k_initial_stack_depth;
+      stack->used = 0U;
     } else {
-      free(stack_ptr);
-      stack_ptr = nullptr;
+      free(stack);
+      stack = nullptr;
     }
   }
 
-  return stack_ptr;
+  return stack;
 }
 
-void stack_deinit(Stack_t *const stack_ptr)
+void stack_deinit(Stack_t *const stack)
 {
-  if (nullptr != stack_ptr) {
-    for (size_t i = 0U; i < stack_ptr->used; ++i) { free((void *)(stack_ptr->cell[i].data)); }
-    free(stack_ptr->cell);
-    free(stack_ptr);
+  if (nullptr != stack) {
+    for (size_t i = 0U; i < stack->used; ++i) { free((void *)(stack->cell[i].data)); }
+    free(stack->cell);
+    free(stack);
   }
 }
 
