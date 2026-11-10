@@ -17,6 +17,7 @@ SOURCES = \
 	cli/cli.c \
 	cli/cli_command_map.c \
 	cli/embedded-cli/lib/src/embedded_cli.c \
+	core/list.c \
 	core/stack.c \
 	main.c
 	

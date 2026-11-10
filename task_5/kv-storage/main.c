@@ -1,5 +1,6 @@
 #include "cli/cli.h"
 #include "cli/cli_command_map.h"
+#include "core/list.h"
 #include "core/stack.h"
 
 #include <stdio.h>
@@ -18,10 +19,15 @@ int main(const int argc, char *argv[])
 
   bool init_status = true;
 
+  List_t *const list   = list_init();
   Stack_t *const stack = stack_init();
 
   init_status = init_status && (nullptr != stack);
-  init_status = init_status && cli_init(&k_stack_command_map, stack);
+  init_status = init_status && (nullptr != list);
+
+  const CliCommandContext_t cmd_context = {.list = list, .stack = stack};
+
+  init_status = init_status && cli_init(&k_stack_command_map, (void *const)&cmd_context);
 
   if (init_status) {
     while (cli_process()) { nanosleep(&k_main_loop_period, nullptr); }
@@ -32,6 +38,7 @@ int main(const int argc, char *argv[])
 
   cli_deinit();
   stack_deinit(stack);
+  list_deinit(list);
 
   return ret;
 }
