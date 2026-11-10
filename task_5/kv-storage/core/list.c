@@ -46,7 +46,7 @@ void list_deinit(List_t *const list)
 
     while (nullptr != current) {
       next_node = current->next;
-      if (nullptr != current->data) { free(current->data); }
+      free(current->data);
       free(current);
       current = next_node;
     }
