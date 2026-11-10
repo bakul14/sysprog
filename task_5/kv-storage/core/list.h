@@ -3,52 +3,21 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 
-typedef struct Node {
-  void *next;
-  void *prev;
-  void *data;
-} Node;
+typedef struct List List_t;
 
-typedef struct List {
-  Node *head;
-  Node *tail;
-  size_t size;
-} List;
+List_t *list_init();
 
-inline List *create_list()
-{ return (List *)malloc(sizeof(List)); }
+void list_deinit(List_t *const list);
 
-inline void delete_list(List *const list)
-{ free(list); }
+bool list_push_back(List_t *const list, const void *const data, const size_t size);
 
-inline bool push_front(List *const list, Node *const node)
-{
-  bool ret = false;
+bool list_push_front(List_t *const list, const void *const data, const size_t size);
 
-  if (nullptr != list && nullptr != node) {
-    list->head->next = list->head;
-    list->head->prev = node;
-    list->head       = node;
-    ret              = true;
-  }
+bool list_pop_back(List_t *const list, void **const data, size_t *const size);
 
-  return ret;
-}
+bool list_pop_front(List_t *const list, void **const data, size_t *const size);
 
-inline bool push_back(List *const list, Node *const node)
-{
-  bool ret = false;
-
-  if (nullptr != list && nullptr != node) {
-    list->tail->prev = list->tail;
-    list->tail->next = node;
-    list->tail       = node;
-    ret              = true;
-  }
-
-  return ret;
-}
+void list_data_free(void **const data);
 
 #endif
