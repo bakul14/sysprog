@@ -3,9 +3,6 @@
 
 #include "cli.h"
 
-#include "../core/list.h"
-#include "../core/stack.h"
-
 extern const CliCommandMap_t k_stack_commands;
 
 extern const CliCommandMap_t k_list_commands;

@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L /* for nanosleep(...) */
+
 #include "cli/cli.h"
 #include "cli/cli_command_map.h"
 #include "core/list.h"
