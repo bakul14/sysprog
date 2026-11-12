@@ -29,7 +29,7 @@ static bool is_raw_mode_ = false;
 
 static bool is_running_ = false;
 
-static void write_char(EmbeddedCli *const cli, const char c)
+static inline void write_char(EmbeddedCli *const cli, const char c)
 {
   (void)cli;
   ssize_t null = 0U;
@@ -37,12 +37,12 @@ static void write_char(EmbeddedCli *const cli, const char c)
   (void)null;
 }
 
-static void print_(const char *const string)
+static inline void print_(const char *const string)
 {
   embeddedCliPrint(embedded_cli_, string);
 }
 
-static void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_ptr)
+static inline void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_ptr)
 {
   (void)cli;
 
@@ -63,7 +63,7 @@ static void on_binding_(EmbeddedCli *const cli, char *const args, void *const bi
   }
 }
 
-static void on_exit_(EmbeddedCli *const cli, char *const args, void *const context)
+static inline void on_exit_(EmbeddedCli *const cli, char *const args, void *const context)
 {
   (void)cli;
   (void)args;
@@ -72,7 +72,7 @@ static void on_exit_(EmbeddedCli *const cli, char *const args, void *const conte
   is_running_   = false;
 }
 
-static bool add_exit_command_()
+static inline bool add_exit_command_()
 {
   const CliCommandBinding binding = {
     .name         = "exit",
@@ -84,7 +84,7 @@ static bool add_exit_command_()
   return embeddedCliAddBinding(embedded_cli_, binding);
 }
 
-static void enable_raw_mode_()
+static inline void enable_raw_mode_()
 {
   if (0 == tcgetattr(STDIN_FILENO, &original_stdin_)) {
     struct termios raw_stdin = original_stdin_;
@@ -93,7 +93,7 @@ static void enable_raw_mode_()
   }
 }
 
-static bool backend_init_()
+static inline bool backend_init_()
 {
   bool ret = false;
 
