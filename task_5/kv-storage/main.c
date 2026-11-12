@@ -26,7 +26,6 @@ int main(const int argc, char *argv[])
 
   init_status = init_status && (nullptr != stack);
   init_status = init_status && (nullptr != list);
-
   init_status = init_status && cli_init();
   init_status = init_status && cli_add_commands(&k_stack_commands, stack);
   init_status = init_status && cli_add_commands(&k_list_commands, list);
