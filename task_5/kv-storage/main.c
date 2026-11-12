@@ -25,12 +25,14 @@ int main(const int argc, char *argv[])
   init_status = init_status && (nullptr != stack);
   init_status = init_status && (nullptr != list);
 
-  const CliCommandContext_t cmd_context = {.list = list, .stack = stack};
-
-  init_status = init_status && cli_init(&k_stack_command_map, (void *const)&cmd_context);
+  init_status = init_status && cli_init();
+  init_status = init_status && cli_add_commands(&k_stack_commands, stack);
+  init_status = init_status && cli_add_commands(&k_list_commands, list);
 
   if (init_status) {
-    while (cli_process()) { nanosleep(&k_main_loop_period, nullptr); }
+    while (cli_process()) {
+      nanosleep(&k_main_loop_period, nullptr);
+    }
     ret = EXIT_SUCCESS;
   } else {
     fputs("Application has not been inited\n", stderr);

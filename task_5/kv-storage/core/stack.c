@@ -56,7 +56,9 @@ Stack_t *stack_init()
 void stack_deinit(Stack_t *const stack)
 {
   if (nullptr != stack) {
-    for (size_t i = 0U; i < stack->used; ++i) { free((void *)(stack->cell[i].data)); }
+    for (size_t i = 0U; i < stack->used; ++i) {
+      free((void *)(stack->cell[i].data));
+    }
     free(stack->cell);
     free(stack);
   }

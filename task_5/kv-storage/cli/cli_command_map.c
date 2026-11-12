@@ -8,7 +8,7 @@
 static void command_push_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
-  Stack_t *const stack = ((CliCommandContext_t *)context)->stack;
+  Stack_t *const stack = context;
 
   if ((nullptr != stack) && (nullptr != print)) {
     if (1U != argc) {
@@ -26,7 +26,7 @@ static void command_pop_(
 {
   (void)argv;
 
-  Stack_t *const stack = ((CliCommandContext_t *)context)->stack;
+  Stack_t *const stack = context;
 
   if ((nullptr != stack) && (nullptr != print)) {
     void *data  = nullptr;
@@ -46,7 +46,7 @@ static void command_pop_(
 static void command_add_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
-  List_t *const list = ((CliCommandContext_t *)context)->list;
+  List_t *const list = context;
 
   if ((nullptr != list) && (nullptr != print)) {
     if (1U != argc) {
@@ -64,7 +64,7 @@ static void command_rm_(
 {
   (void)argv;
 
-  List_t *const list = ((CliCommandContext_t *)context)->list;
+  List_t *const list = context;
 
   if ((nullptr != list) && (nullptr != print)) {
     void *data  = nullptr;
@@ -81,12 +81,18 @@ static void command_rm_(
   }
 }
 
-static const ArgCallbackPair_t cli_commands_[] = {
+static const ArgCallbackPair_t stack_commands_[] = {
   {.arg = "push", .help = "Push value onto the stack: push <value>", .callback = command_push_},
   {.arg = "pop", .help = "Pop value from the stack", .callback = command_pop_},
-  {.arg = "add", .help = "Add value to the list", .callback = command_add_},
+};
+
+static const ArgCallbackPair_t list_commands_[] = {
+  {.arg = "add", .help = "Add value to the list: add <value>", .callback = command_add_},
   {.arg = "rm", .help = "Remove value from the list", .callback = command_rm_},
 };
 
-const CliCommandMap_t k_stack_command_map = {
-  .arg_callback = cli_commands_, .num = sizeof(cli_commands_) / sizeof(cli_commands_[0])};
+const CliCommandMap_t k_stack_commands = {
+  .arg_callback = stack_commands_, .num = sizeof(stack_commands_) / sizeof(stack_commands_[0])};
+
+const CliCommandMap_t k_list_commands = {
+  .arg_callback = list_commands_, .num = sizeof(list_commands_) / sizeof(list_commands_[0])};

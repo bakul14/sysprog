@@ -20,7 +20,9 @@ typedef struct CliCommandMap {
   size_t num;
 } CliCommandMap_t;
 
-bool cli_init(const CliCommandMap_t *const map, void *const context);
+bool cli_init();
+
+bool cli_add_commands(const CliCommandMap_t *const map, void *const context);
 
 bool cli_process();
 

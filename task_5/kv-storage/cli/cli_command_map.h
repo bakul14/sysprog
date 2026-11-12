@@ -6,11 +6,8 @@
 #include "../core/list.h"
 #include "../core/stack.h"
 
-extern const CliCommandMap_t k_stack_command_map;
+extern const CliCommandMap_t k_stack_commands;
 
-typedef struct CliCommandContext {
-  List_t *const list;
-  Stack_t *const stack;
-} CliCommandContext_t;
+extern const CliCommandMap_t k_list_commands;
 
 #endif
