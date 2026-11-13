@@ -8,24 +8,24 @@ static constexpr size_t k_secret_field_size = 64U;
 
 typedef struct SecretData {
   char service[k_secret_field_size];
-  char password[k_secret_field_size];
+  char secret[k_secret_field_size];
 } SecretData_t;
 
 static inline bool secret_fill(
-  SecretData_t *const secret, const char *const service, const char *const password)
+  SecretData_t *const secret_data, const char *const service, const char *const secret)
 {
   bool ret = false;
 
-  const bool input_ok = (nullptr != secret) && (nullptr != service) && (nullptr != password);
+  const bool input_ok = (nullptr != secret_data) && (nullptr != service) && (nullptr != secret);
 
   if (input_ok) {
-    const size_t service_len  = strlen(service);
-    const size_t password_len = strlen(password);
+    const size_t service_len = strlen(service);
+    const size_t secret_len  = strlen(secret);
 
-    if ((service_len < k_secret_field_size) && (password_len < k_secret_field_size)) {
-      *secret = (SecretData_t){};
-      memcpy(secret->service, service, service_len);
-      memcpy(secret->password, password, password_len);
+    if ((service_len < k_secret_field_size) && (secret_len < k_secret_field_size)) {
+      *secret_data = (SecretData_t){};
+      memcpy(secret_data->service, service, service_len);
+      memcpy(secret_data->secret, secret, secret_len);
       ret = true;
     }
   }
@@ -39,9 +39,9 @@ static inline bool secret_match_service(
   bool ret = false;
 
   if ((nullptr != data) && (sizeof(SecretData_t) == size) && (nullptr != key)) {
-    const SecretData_t *const secret = data;
+    const SecretData_t *const secret_data = data;
 
-    ret = (0 == strcmp(secret->service, (const char *)key));
+    ret = (0 == strcmp(secret_data->service, (const char *)key));
   }
 
   return ret;

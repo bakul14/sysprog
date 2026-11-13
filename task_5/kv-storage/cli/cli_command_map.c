@@ -11,7 +11,7 @@ static void print_secret_(const CliPrint_t print, const void *const data)
   const SecretData_t *const secret = data;
 
   char line[2U * k_secret_field_size + 8U] = {};
-  snprintf(line, sizeof(line), "%s: %s", secret->service, secret->password);
+  snprintf(line, sizeof(line), "%s: %s", secret->service, secret->secret);
   print(line);
 }
 
@@ -59,9 +59,9 @@ static void command_stack_push_(
   const void *existing = nullptr;
 
   if (2U != argc) {
-    print("Usage: push <service> <password>");
+    print("Usage: push <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: service and password must be shorter than 64 chars");
+    print("ERROR: service and secret must be shorter than 64 chars");
   } else if (stack_find(stack, secret_match_service, argv[0], &existing)) {
     print("ERROR: service already exists, use edit");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
@@ -113,9 +113,9 @@ static void command_stack_edit_(
   const void *existing = nullptr;
 
   if (2U != argc) {
-    print("Usage: edit <service> <password>");
+    print("Usage: edit <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: service and password must be shorter than 64 chars");
+    print("ERROR: service and secret must be shorter than 64 chars");
   } else if (!stack_find(stack, secret_match_service, argv[0], &existing)) {
     print("ERROR: not found");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
@@ -148,9 +148,9 @@ static void command_list_add_(
   const void *existing = nullptr;
 
   if (2U != argc) {
-    print("Usage: add <service> <password>");
+    print("Usage: add <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: service and password must be shorter than 64 chars");
+    print("ERROR: service and secret must be shorter than 64 chars");
   } else if (list_find(list, secret_match_service, argv[0], &existing)) {
     print("ERROR: service already exists, use edit");
   } else if (list_push_back(list, &secret, sizeof(secret))) {
@@ -215,9 +215,9 @@ static void command_list_edit_(
   SecretData_t secret = {};
 
   if (2U != argc) {
-    print("Usage: edit <service> <password>");
+    print("Usage: edit <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: service and password must be shorter than 64 chars");
+    print("ERROR: service and secret must be shorter than 64 chars");
   } else if (list_edit(list, secret_match_service, argv[0], &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -289,23 +289,23 @@ static void command_list_show_(
 
 // clang-format off
 static const ArgCallbackPair_t stack_commands_[] = {
-  {.arg = "push", .help = "Add new service: push <service> <password>", .callback = command_stack_push_},
+  {.arg = "push", .help = "Add new service: push <service> <secret>", .callback = command_stack_push_},
   {.arg = "pop", .help = "Undo the last push / edit", .callback = command_stack_pop_},
-  {.arg = "get", .help = "Show password of the latest version: get <service>", .callback = command_stack_get_},
-  {.arg = "edit", .help = "Add new version: edit <service> <password>", .callback = command_stack_edit_},
+  {.arg = "get", .help = "Show secret of the latest version: get <service>", .callback = command_stack_get_},
+  {.arg = "edit", .help = "Add new version: edit <service> <secret>", .callback = command_stack_edit_},
   {.arg = "show", .help = "Show all services", .callback = command_stack_show_},
 };
 // clang-format on
 
 // clang-format off
 static const ArgCallbackPair_t list_commands_[] = {
-  {.arg = "add",  .help = "Add secret: add <service> <password>", .callback = command_list_add_},
+  {.arg = "add",  .help = "Add secret: add <service> <secret>", .callback = command_list_add_},
   {.arg = "rm",   .help = "Remove secret: rm <service>", .callback = command_list_rm_},
   {.arg = "next", .help = "Select the next service", .callback = command_list_next_},
   {.arg = "prev", .help = "Select the previous service", .callback = command_list_prev_},
-  {.arg = "edit", .help = "Change password: edit <service> <password>", .callback = command_list_edit_},
+  {.arg = "edit", .help = "Change secret: edit <service> <secret>", .callback = command_list_edit_},
   {.arg = "find", .help = "Select service: find <service>", .callback = command_list_find_},
-  {.arg = "get",  .help = "Show password: get <service>", .callback = command_list_get_},
+  {.arg = "get",  .help = "Show secret: get <service>", .callback = command_list_get_},
   {.arg = "cur",  .help = "Show the selected service", .callback = command_list_cur_},
   {.arg = "show", .help = "Show all services", .callback = command_list_show_},
 };
