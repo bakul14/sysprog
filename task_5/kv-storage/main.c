@@ -1,15 +1,16 @@
 #define _POSIX_C_SOURCE 200809L /* for nanosleep(...) */
 
+#include "common/options.h"
+
 #include "cli/cli.h"
 #include "cli/cli_command_map.h"
 #include "core/list.h"
 #include "core/stack.h"
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 constexpr struct timespec k_main_loop_period = {.tv_sec = 0, .tv_nsec = 10000000};
 
@@ -17,40 +18,25 @@ int main(const int argc, char *argv[])
 {
   int ret = EXIT_FAILURE;
 
-  const bool use_stack = (2 == argc) && (0 == strcmp(argv[1], "--stack"));
-  const bool use_list  = (2 == argc) && (0 == strcmp(argv[1], "--list"));
+  const int option = getopt_long(argc, argv, k_kvs_short_options, k_kvs_long_options, nullptr);
 
-  Stack_t *stack = nullptr;
-  List_t *list   = nullptr;
+  List_t *const list   = ('l' == option) ? list_init() : nullptr;
+  Stack_t *const stack = ('s' == option) ? stack_init() : nullptr;
 
-  const CliCommandMap_t *commands = nullptr;
-  void *container                 = nullptr;
+  bool init_status = true;
 
-  if (use_stack) {
-    stack     = stack_init();
-    commands  = &k_stack_commands;
-    container = stack;
-  } else if (use_list) {
-    list      = list_init();
-    commands  = &k_list_commands;
-    container = list;
-  } else {
-    fprintf(stderr, "Usage: %s --stack | --list\n", argv[0]);
-  }
-
-  // clang-format off
-  const bool init_status = (nullptr != container) &&
-                           cli_init()             &&
-                           cli_add_commands(commands, container);
-  // clang-format on
+  init_status = init_status && (list || stack);
+  init_status = init_status && cli_init();
+  init_status = init_status && (!stack || cli_add_commands(&k_stack_commands, stack));
+  init_status = init_status && (!list || cli_add_commands(&k_list_commands, list));
 
   if (init_status) {
     while (cli_process()) {
       nanosleep(&k_main_loop_period, nullptr);
     }
     ret = EXIT_SUCCESS;
-  } else if (nullptr != commands) {
-    fputs("Application has not been inited\n", stderr);
+  } else {
+    fprintf(stderr, "Usage: %s --stack | --list\n", argv[0]);
   }
 
   cli_deinit();
