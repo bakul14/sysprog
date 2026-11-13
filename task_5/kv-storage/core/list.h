@@ -1,7 +1,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct List List_t;

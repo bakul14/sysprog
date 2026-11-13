@@ -1,7 +1,6 @@
 #ifndef CLI_H
 #define CLI_H
 
-#include <stdbool.h>
 #include <stddef.h>
 
 typedef void (*CliPrint_t)(const char *const string);

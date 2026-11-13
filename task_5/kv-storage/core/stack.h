@@ -1,7 +1,6 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct Stack Stack_t;
