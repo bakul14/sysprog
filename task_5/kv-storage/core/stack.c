@@ -115,9 +115,7 @@ void stack_data_free(void **const data)
 }
 
 bool stack_find(
-  const Stack_t *const stack,
-  const StackMatch_t match,
-  const void *const key,
+  const Stack_t *const stack, const StackMatch_t match, const void *const key,
   const void **const data_out)
 {
   bool ret = false;
@@ -136,4 +134,53 @@ bool stack_find(
   }
 
   return ret;
+}
+
+// clang-format off
+bool stack_edit(
+  Stack_t *const stack,
+  const StackMatch_t match,
+  const void *const key,
+  const void *const data,
+  const size_t size)
+// clang-format on
+{
+  bool ret = false;
+
+  // clang-format off
+  if ((nullptr != stack) &&
+      (nullptr != match) &&
+      (nullptr != data)  &&
+      (size > 0U))
+  // clang-format on
+  {
+    Cell_t *cell = nullptr;
+
+    for (size_t i = stack->used; (i > 0U) && (nullptr == cell); --i) {
+      if (match(stack->cell[i - 1U].data, stack->cell[i - 1U].size, key)) {
+        cell = &stack->cell[i - 1U];
+      }
+    }
+
+    void *const data_copy = (nullptr != cell) ? malloc(size) : nullptr;
+
+    if (nullptr != data_copy) {
+      memcpy(data_copy, data, size);
+      free(cell->data);
+      cell->data = data_copy;
+      cell->size = size;
+      ret        = true;
+    }
+  }
+
+  return ret;
+}
+
+void stack_foreach(const Stack_t *const stack, const StackVisit_t visit, void *const context)
+{
+  if ((nullptr != stack) && (nullptr != visit)) {
+    for (size_t i = stack->used; i > 0U; --i) {
+      visit(stack->cell[i - 1U].data, stack->cell[i - 1U].size, context);
+    }
+  }
 }

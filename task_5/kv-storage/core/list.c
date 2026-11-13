@@ -301,3 +301,24 @@ bool list_remove(List_t *const list)
 
   return ret;
 }
+
+bool list_current(const List_t *const list, const void **const data_out)
+{
+  bool ret = false;
+
+  if ((nullptr != list) && (nullptr != data_out) && (list->current != list->first_node)) {
+    *data_out = list->current->data;
+    ret       = true;
+  }
+
+  return ret;
+}
+
+void list_foreach(const List_t *const list, const ListVisit_t visit, void *const context)
+{
+  if ((nullptr != list) && (nullptr != visit)) {
+    for (const Node_t *node = list->first_node->next; nullptr != node; node = node->next) {
+      visit(node->data, node->data_size, context);
+    }
+  }
+}

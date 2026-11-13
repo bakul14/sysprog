@@ -32,4 +32,10 @@ bool list_edit(List_t *const list, const void *const data, const size_t size);
 
 bool list_remove(List_t *const list);
 
+bool list_current(const List_t *const list, const void **const data_out);
+
+typedef void (*ListVisit_t)(const void *const data, const size_t size, void *const context);
+
+void list_foreach(const List_t *const list, const ListVisit_t visit, void *const context);
+
 #endif

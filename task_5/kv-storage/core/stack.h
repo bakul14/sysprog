@@ -17,11 +17,24 @@ void stack_data_free(void **const data);
 
 typedef bool (*StackMatch_t)(const void *const data, const size_t size, const void *const key);
 
-/* Searches from top to bottom */
+// clang-format off
 bool stack_find(
   const Stack_t *const stack,
   const StackMatch_t match,
   const void *const key,
   const void **const data_out);
+
+bool stack_edit(
+  Stack_t *const stack,
+  const StackMatch_t match,
+  const void *const key,
+  const void *const data,
+  const size_t size);
+// clang-format on
+
+typedef void (*StackVisit_t)(const void *const data, const size_t size, void *const context);
+
+/* Visits items from top to bottom */
+void stack_foreach(const Stack_t *const stack, const StackVisit_t visit, void *const context);
 
 #endif
