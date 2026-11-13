@@ -40,6 +40,14 @@ bool list_edit(
 
 bool list_remove(List_t *const list, const ListMatch_t match, const void *const key);
 
+// clang-format off
+bool list_seek(
+  List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void **const data_out);
+// clang-format on
+
 bool list_next(List_t *const list, const void **const data_out);
 
 bool list_prev(List_t *const list, const void **const data_out);

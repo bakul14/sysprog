@@ -15,12 +15,17 @@ static void print_secret_(const CliPrint_t print, const void *const data)
   print(line);
 }
 
-static void print_service_(const void *const data, const size_t size, void *const context)
+static void print_service_(const CliPrint_t print, const void *const data)
+{
+  print(((const SecretData_t *)data)->service);
+}
+
+static void visit_service_(const void *const data, const size_t size, void *const context)
 {
   const CliPrint_t *const print = context;
 
   if (sizeof(SecretData_t) == size) {
-    (*print)(((const SecretData_t *)data)->service);
+    print_service_(*print, data);
   }
 }
 
@@ -29,7 +34,7 @@ typedef struct StackShowContext {
   CliPrint_t print;
 } StackShowContext_t;
 
-static void print_latest_service_(const void *const data, const size_t size, void *const context)
+static void visit_latest_service_(const void *const data, const size_t size, void *const context)
 {
   const StackShowContext_t *const show = context;
   const SecretData_t *const secret     = data;
@@ -42,7 +47,7 @@ static void print_latest_service_(const void *const data, const size_t size, voi
   // clang-format on
 
   if (is_latest) {
-    show->print(secret->service);
+    print_service_(show->print, secret);
   }
 }
 
@@ -78,21 +83,21 @@ static void command_stack_pop_(
   if (0U != argc) {
     print("Usage: pop");
   } else if (stack_pop(stack, &data, &size)) {
-    print_secret_(print, data);
+    print_service_(print, data);
     stack_data_free(&data);
   } else {
     print("ERROR: stack is empty");
   }
 }
 
-static void command_stack_find_(
+static void command_stack_get_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
   const Stack_t *const stack = context;
   const void *data           = nullptr;
 
   if (1U != argc) {
-    print("Usage: find <service>");
+    print("Usage: get <service>");
   } else if (stack_find(stack, secret_match_service, argv[0], &data)) {
     print_secret_(print, data);
   } else {
@@ -131,7 +136,7 @@ static void command_stack_show_(
   if (0U != argc) {
     print("Usage: show");
   } else {
-    stack_foreach(stack, print_latest_service_, &show);
+    stack_foreach(stack, visit_latest_service_, &show);
   }
 }
 
@@ -180,7 +185,7 @@ static void command_list_next_(
   if (0U != argc) {
     print("Usage: next");
   } else if (list_next(list, &data)) {
-    print_secret_(print, data);
+    print_service_(print, data);
   } else {
     print("ERROR: end of list");
   }
@@ -197,7 +202,7 @@ static void command_list_prev_(
   if (0U != argc) {
     print("Usage: prev");
   } else if (list_prev(list, &data)) {
-    print_secret_(print, data);
+    print_service_(print, data);
   } else {
     print("ERROR: beginning of list");
   }
@@ -223,11 +228,26 @@ static void command_list_edit_(
 static void command_list_find_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
+  List_t *const list = context;
+  const void *data   = nullptr;
+
+  if (1U != argc) {
+    print("Usage: find <service>");
+  } else if (list_seek(list, secret_match_service, argv[0], &data)) {
+    print_service_(print, data);
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_list_get_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
   const List_t *const list = context;
   const void *data         = nullptr;
 
   if (1U != argc) {
-    print("Usage: find <service>");
+    print("Usage: get <service>");
   } else if (list_find(list, secret_match_service, argv[0], &data)) {
     print_secret_(print, data);
   } else {
@@ -246,7 +266,7 @@ static void command_list_cur_(
   if (0U != argc) {
     print("Usage: cur");
   } else if (list_current(list, &data)) {
-    print_secret_(print, data);
+    print_service_(print, data);
   } else {
     print("ERROR: no item selected");
   }
@@ -263,7 +283,7 @@ static void command_list_show_(
   if (0U != argc) {
     print("Usage: show");
   } else {
-    list_foreach(list, print_service_, &print_copy);
+    list_foreach(list, visit_service_, &print_copy);
   }
 }
 
@@ -271,7 +291,7 @@ static void command_list_show_(
 static const ArgCallbackPair_t stack_commands_[] = {
   {.arg = "push", .help = "Add new service: push <service> <password>", .callback = command_stack_push_},
   {.arg = "pop", .help = "Undo the last push / edit", .callback = command_stack_pop_},
-  {.arg = "find", .help = "Show latest version: find <service>", .callback = command_stack_find_},
+  {.arg = "get", .help = "Show password of the latest version: get <service>", .callback = command_stack_get_},
   {.arg = "edit", .help = "Add new version: edit <service> <password>", .callback = command_stack_edit_},
   {.arg = "show", .help = "Show all services", .callback = command_stack_show_},
 };
@@ -281,11 +301,12 @@ static const ArgCallbackPair_t stack_commands_[] = {
 static const ArgCallbackPair_t list_commands_[] = {
   {.arg = "add",  .help = "Add secret: add <service> <password>", .callback = command_list_add_},
   {.arg = "rm",   .help = "Remove secret: rm <service>", .callback = command_list_rm_},
-  {.arg = "next", .help = "Select and show the next secret", .callback = command_list_next_},
-  {.arg = "prev", .help = "Select and show the previous secret", .callback = command_list_prev_},
+  {.arg = "next", .help = "Select the next service", .callback = command_list_next_},
+  {.arg = "prev", .help = "Select the previous service", .callback = command_list_prev_},
   {.arg = "edit", .help = "Change password: edit <service> <password>", .callback = command_list_edit_},
-  {.arg = "find", .help = "Show secret: find <service>", .callback = command_list_find_},
-  {.arg = "cur",  .help = "Show the selected secret", .callback = command_list_cur_},
+  {.arg = "find", .help = "Select service: find <service>", .callback = command_list_find_},
+  {.arg = "get",  .help = "Show password: get <service>", .callback = command_list_get_},
+  {.arg = "cur",  .help = "Show the selected service", .callback = command_list_cur_},
   {.arg = "show", .help = "Show all services", .callback = command_list_show_},
 };
 //clang-format on

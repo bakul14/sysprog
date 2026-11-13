@@ -233,6 +233,29 @@ bool list_find(
   return ret;
 }
 
+// clang-format off
+bool list_seek(
+  List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void **const data_out)
+// clang-format on
+{
+  bool ret = false;
+
+  if (nullptr != data_out) {
+    Node_t *const node = find_node_(list, match, key);
+
+    if (nullptr != node) {
+      list->current = node;
+      *data_out     = node->data;
+      ret           = true;
+    }
+  }
+
+  return ret;
+}
+
 bool list_next(List_t *const list, const void **const data_out)
 {
   bool ret = false;
