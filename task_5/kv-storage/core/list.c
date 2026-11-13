@@ -14,6 +14,7 @@ typedef struct Node {
 typedef struct List {
   Node_t *first_node;
   Node_t *last_node;
+  Node_t *current;
   size_t size;
 } List_t;
 
@@ -27,6 +28,7 @@ List_t *list_init()
     if (nullptr != dummy_node) {
       list->first_node = dummy_node;
       list->last_node  = dummy_node;
+      list->current    = dummy_node;
       list->size       = 0U;
     } else {
       free(list);
@@ -140,6 +142,10 @@ bool list_pop_back(List_t *const list, void **const data, size_t *const size)
     prev_node->next         = nullptr;
     list->last_node         = prev_node;
 
+    if (list->current == node_to_remove) {
+      list->current = list->first_node;
+    }
+
     free(node_to_remove);
     --(list->size);
 
@@ -169,6 +175,10 @@ bool list_pop_front(List_t *const list, void **const data, size_t *const size)
       list->last_node = dummy;
     }
 
+    if (list->current == node_to_remove) {
+      list->current = dummy;
+    }
+
     free(node_to_remove);
     --(list->size);
 
@@ -187,24 +197,106 @@ void list_data_free(void **const data)
 }
 
 bool list_find(
-  const List_t *const list, const ListMatch_t match, const void *const key, const void **data_out)
+  List_t *const list, const ListMatch_t match, const void *const key, const void **const data_out)
 {
   bool ret = false;
 
-  data_out = nullptr;
+  if ((nullptr != list) && (nullptr != match) && (nullptr != data_out)) {
+    *data_out = nullptr;
 
-  if ((nullptr != list) && (nullptr != match)) {
-    // clang-format off
-    for (const Node_t *node = list->first_node->next;
-        (nullptr != node) && (nullptr == data_out);
-        (node = node->next))
-    // clang-format on
-    {
+    for (Node_t *node = list->first_node->next; (nullptr != node) && !ret; node = node->next) {
       if (match(node->data, node->data_size, key)) {
-        *data_out = node->data;
-        ret       = true;
+        list->current = node;
+        *data_out     = node->data;
+        ret           = true;
       }
     }
+  }
+
+  return ret;
+}
+
+bool list_next(List_t *const list, const void **const data_out)
+{
+  bool ret = false;
+
+  if ((nullptr != list) && (nullptr != data_out) && (nullptr != list->current->next)) {
+    list->current = list->current->next;
+    *data_out     = list->current->data;
+    ret           = true;
+  }
+
+  return ret;
+}
+
+bool list_prev(List_t *const list, const void **const data_out)
+{
+  bool ret = false;
+
+  // clang-format off
+  if ((nullptr != list)                       &&
+      (nullptr != data_out)                   &&
+      (list->current != list->first_node)     &&
+      (list->current->prev != list->first_node))
+  // clang-format on
+  {
+    list->current = list->current->prev;
+    *data_out     = list->current->data;
+    ret           = true;
+  }
+
+  return ret;
+}
+
+bool list_edit(List_t *const list, const void *const data, const size_t size)
+{
+  bool ret = false;
+
+  // clang-format off
+  if ((nullptr != list)                   &&
+      (list->current != list->first_node) &&
+      (nullptr != data)                   &&
+      (size > 0U))
+  // clang-format on
+  {
+    void *const data_copy = malloc(size);
+
+    if (nullptr != data_copy) {
+      memcpy(data_copy, data, size);
+      free(list->current->data);
+      list->current->data      = data_copy;
+      list->current->data_size = size;
+      ret                      = true;
+    }
+  }
+
+  return ret;
+}
+
+bool list_remove(List_t *const list)
+{
+  bool ret = false;
+
+  if ((nullptr != list) && (list->current != list->first_node)) {
+    Node_t *const node_to_remove = list->current;
+    Node_t *const prev_node      = node_to_remove->prev;
+    Node_t *const next_node      = node_to_remove->next;
+
+    prev_node->next = next_node;
+
+    if (nullptr != next_node) {
+      next_node->prev = prev_node;
+      list->current   = next_node;
+    } else {
+      list->last_node = prev_node;
+      list->current   = prev_node;
+    }
+
+    free(node_to_remove->data);
+    free(node_to_remove);
+    --(list->size);
+
+    ret = true;
   }
 
   return ret;

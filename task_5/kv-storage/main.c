@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -14,28 +15,41 @@ constexpr struct timespec k_main_loop_period = {.tv_sec = 0, .tv_nsec = 10000000
 
 int main(const int argc, char *argv[])
 {
-  (void)argc;
-  (void)argv;
-
   int ret = EXIT_FAILURE;
 
-  bool init_status = true;
+  const bool use_stack = (2 == argc) && (0 == strcmp(argv[1], "--stack"));
+  const bool use_list  = (2 == argc) && (0 == strcmp(argv[1], "--list"));
 
-  List_t *const list   = list_init();
-  Stack_t *const stack = stack_init();
+  Stack_t *stack = nullptr;
+  List_t *list   = nullptr;
 
-  init_status = init_status && (nullptr != stack);
-  init_status = init_status && (nullptr != list);
-  init_status = init_status && cli_init();
-  init_status = init_status && cli_add_commands(&k_stack_commands, stack);
-  init_status = init_status && cli_add_commands(&k_list_commands, list);
+  const CliCommandMap_t *commands = nullptr;
+  void *container                 = nullptr;
+
+  if (use_stack) {
+    stack     = stack_init();
+    commands  = &k_stack_commands;
+    container = stack;
+  } else if (use_list) {
+    list      = list_init();
+    commands  = &k_list_commands;
+    container = list;
+  } else {
+    fprintf(stderr, "Usage: %s --stack | --list\n", argv[0]);
+  }
+
+  // clang-format off
+  const bool init_status = (nullptr != container) &&
+                           cli_init()             &&
+                           cli_add_commands(commands, container);
+  // clang-format on
 
   if (init_status) {
     while (cli_process()) {
       nanosleep(&k_main_loop_period, nullptr);
     }
     ret = EXIT_SUCCESS;
-  } else {
+  } else if (nullptr != commands) {
     fputs("Application has not been inited\n", stderr);
   }
 

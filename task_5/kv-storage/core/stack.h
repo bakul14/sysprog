@@ -15,4 +15,13 @@ bool stack_pop(Stack_t *const stack, void **const data, size_t *const size);
 
 void stack_data_free(void **const data);
 
+typedef bool (*StackMatch_t)(const void *const data, const size_t size, const void *const key);
+
+/* Searches from top to bottom */
+bool stack_find(
+  const Stack_t *const stack,
+  const StackMatch_t match,
+  const void *const key,
+  const void **const data_out);
+
 #endif

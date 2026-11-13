@@ -113,3 +113,27 @@ void stack_data_free(void **const data)
     *data = nullptr;
   }
 }
+
+bool stack_find(
+  const Stack_t *const stack,
+  const StackMatch_t match,
+  const void *const key,
+  const void **const data_out)
+{
+  bool ret = false;
+
+  if ((nullptr != stack) && (nullptr != match) && (nullptr != data_out)) {
+    *data_out = nullptr;
+
+    for (size_t i = stack->used; (i > 0U) && !ret; --i) {
+      const Cell_t *const cell = &stack->cell[i - 1U];
+
+      if (match(cell->data, cell->size, key)) {
+        *data_out = cell->data;
+        ret       = true;
+      }
+    }
+  }
+
+  return ret;
+}
