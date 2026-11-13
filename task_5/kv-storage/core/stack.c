@@ -136,7 +136,6 @@ bool stack_find(
   return ret;
 }
 
-// clang-format off
 void stack_foreach(const Stack_t *const stack, const StackVisit_t visit, void *const context)
 {
   if ((nullptr != stack) && (nullptr != visit)) {
