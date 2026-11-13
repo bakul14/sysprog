@@ -196,21 +196,38 @@ void list_data_free(void **const data)
   }
 }
 
+static Node_t *find_node_(const List_t *const list, const ListMatch_t match, const void *const key)
+{
+  Node_t *ret = nullptr;
+
+  if ((nullptr != list) && (nullptr != match)) {
+    for (Node_t *node = list->first_node->next; (nullptr != node) && (nullptr == ret);
+         node         = node->next)
+    {
+      if (match(node->data, node->data_size, key)) {
+        ret = node;
+      }
+    }
+  }
+
+  return ret;
+}
+
+// clang-format off
 bool list_find(
-  List_t *const list, const ListMatch_t match, const void *const key, const void **const data_out)
+  const List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void **const data_out)
+// clang-format on
 {
   bool ret = false;
 
-  if ((nullptr != list) && (nullptr != match) && (nullptr != data_out)) {
-    *data_out = nullptr;
+  if (nullptr != data_out) {
+    const Node_t *const node = find_node_(list, match, key);
 
-    for (Node_t *node = list->first_node->next; (nullptr != node) && !ret; node = node->next) {
-      if (match(node->data, node->data_size, key)) {
-        list->current = node;
-        *data_out     = node->data;
-        ret           = true;
-      }
-    }
+    *data_out = (nullptr != node) ? node->data : nullptr;
+    ret       = (nullptr != node);
   }
 
   return ret;
@@ -248,48 +265,54 @@ bool list_prev(List_t *const list, const void **const data_out)
   return ret;
 }
 
-bool list_edit(List_t *const list, const void *const data, const size_t size)
+// clang-format off
+bool list_edit(
+  List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void *const data,
+  const size_t size)
+// clang-format on
 {
   bool ret = false;
 
-  // clang-format off
-  if ((nullptr != list)                   &&
-      (list->current != list->first_node) &&
-      (nullptr != data)                   &&
-      (size > 0U))
-  // clang-format on
-  {
+  Node_t *const node = find_node_(list, match, key);
+
+  if ((nullptr != node) && (nullptr != data) && (size > 0U)) {
     void *const data_copy = malloc(size);
 
     if (nullptr != data_copy) {
       memcpy(data_copy, data, size);
-      free(list->current->data);
-      list->current->data      = data_copy;
-      list->current->data_size = size;
-      ret                      = true;
+      free(node->data);
+      node->data      = data_copy;
+      node->data_size = size;
+      ret             = true;
     }
   }
 
   return ret;
 }
 
-bool list_remove(List_t *const list)
+bool list_remove(List_t *const list, const ListMatch_t match, const void *const key)
 {
   bool ret = false;
 
-  if ((nullptr != list) && (list->current != list->first_node)) {
-    Node_t *const node_to_remove = list->current;
-    Node_t *const prev_node      = node_to_remove->prev;
-    Node_t *const next_node      = node_to_remove->next;
+  Node_t *const node_to_remove = find_node_(list, match, key);
+
+  if (nullptr != node_to_remove) {
+    Node_t *const prev_node = node_to_remove->prev;
+    Node_t *const next_node = node_to_remove->next;
 
     prev_node->next = next_node;
 
     if (nullptr != next_node) {
       next_node->prev = prev_node;
-      list->current   = next_node;
     } else {
       list->last_node = prev_node;
-      list->current   = prev_node;
+    }
+
+    if (list->current == node_to_remove) {
+      list->current = prev_node;
     }
 
     free(node_to_remove->data);

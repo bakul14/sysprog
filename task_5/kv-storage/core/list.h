@@ -21,16 +21,28 @@ void list_data_free(void **const data);
 
 typedef bool (*ListMatch_t)(const void *const data, const size_t size, const void *const key);
 
+// clang-format off
 bool list_find(
-  List_t *const list, const ListMatch_t match, const void *const key, const void **const data_out);
+  const List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void **const data_out);
+// clang-format on
+
+// clang-format off
+bool list_edit(
+  List_t *const list,
+  const ListMatch_t match,
+  const void *const key,
+  const void *const data,
+  const size_t size);
+// clang-format on
+
+bool list_remove(List_t *const list, const ListMatch_t match, const void *const key);
 
 bool list_next(List_t *const list, const void **const data_out);
 
 bool list_prev(List_t *const list, const void **const data_out);
-
-bool list_edit(List_t *const list, const void *const data, const size_t size);
-
-bool list_remove(List_t *const list);
 
 bool list_current(const List_t *const list, const void **const data_out);
 

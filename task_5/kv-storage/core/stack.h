@@ -23,13 +23,6 @@ bool stack_find(
   const StackMatch_t match,
   const void *const key,
   const void **const data_out);
-
-bool stack_edit(
-  Stack_t *const stack,
-  const StackMatch_t match,
-  const void *const key,
-  const void *const data,
-  const size_t size);
 // clang-format on
 
 typedef void (*StackVisit_t)(const void *const data, const size_t size, void *const context);

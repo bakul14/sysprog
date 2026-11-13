@@ -24,16 +24,41 @@ static void print_service_(const void *const data, const size_t size, void *cons
   }
 }
 
+typedef struct StackShowContext {
+  const Stack_t *stack;
+  CliPrint_t print;
+} StackShowContext_t;
+
+static void print_latest_service_(const void *const data, const size_t size, void *const context)
+{
+  const StackShowContext_t *const show = context;
+  const SecretData_t *const secret     = data;
+  const void *latest                   = nullptr;
+
+  // clang-format off
+  const bool is_latest = (sizeof(SecretData_t) == size) &&
+                         stack_find(show->stack, secret_match_service, secret->service, &latest) &&
+                         (latest == data);
+  // clang-format on
+
+  if (is_latest) {
+    show->print(secret->service);
+  }
+}
+
 static void command_stack_push_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
   Stack_t *const stack = context;
   SecretData_t secret  = {};
+  const void *existing = nullptr;
 
   if (2U != argc) {
     print("Usage: push <service> <password>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and password must be shorter than 64 chars");
+  } else if (stack_find(stack, secret_match_service, argv[0], &existing)) {
+    print("ERROR: service already exists, use edit");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -80,15 +105,18 @@ static void command_stack_edit_(
 {
   Stack_t *const stack = context;
   SecretData_t secret  = {};
+  const void *existing = nullptr;
 
   if (2U != argc) {
     print("Usage: edit <service> <password>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and password must be shorter than 64 chars");
-  } else if (stack_edit(stack, secret_match_service, argv[0], &secret, sizeof(secret))) {
+  } else if (!stack_find(stack, secret_match_service, argv[0], &existing)) {
+    print("ERROR: not found");
+  } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
   } else {
-    print("ERROR: not found");
+    print("ERROR: edit failed");
   }
 }
 
@@ -98,25 +126,28 @@ static void command_stack_show_(
   (void)argv;
 
   const Stack_t *const stack = context;
-  CliPrint_t print_copy      = print;
+  StackShowContext_t show    = {.stack = stack, .print = print};
 
   if (0U != argc) {
     print("Usage: show");
   } else {
-    stack_foreach(stack, print_service_, &print_copy);
+    stack_foreach(stack, print_latest_service_, &show);
   }
 }
 
 static void command_list_add_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
-  List_t *const list  = context;
-  SecretData_t secret = {};
+  List_t *const list   = context;
+  SecretData_t secret  = {};
+  const void *existing = nullptr;
 
   if (2U != argc) {
     print("Usage: add <service> <password>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and password must be shorter than 64 chars");
+  } else if (list_find(list, secret_match_service, argv[0], &existing)) {
+    print("ERROR: service already exists, use edit");
   } else if (list_push_back(list, &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -127,16 +158,14 @@ static void command_list_add_(
 static void command_list_rm_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
-  (void)argv;
-
   List_t *const list = context;
 
-  if (0U != argc) {
-    print("Usage: rm");
-  } else if (list_remove(list)) {
+  if (1U != argc) {
+    print("Usage: rm <service>");
+  } else if (list_remove(list, secret_match_service, argv[0])) {
     print("OK");
   } else {
-    print("ERROR: no item selected");
+    print("ERROR: not found");
   }
 }
 
@@ -184,18 +213,18 @@ static void command_list_edit_(
     print("Usage: edit <service> <password>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and password must be shorter than 64 chars");
-  } else if (list_edit(list, &secret, sizeof(secret))) {
+  } else if (list_edit(list, secret_match_service, argv[0], &secret, sizeof(secret))) {
     print("OK");
   } else {
-    print("ERROR: no item selected");
+    print("ERROR: not found");
   }
 }
 
 static void command_list_find_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
-  List_t *const list = context;
-  const void *data   = nullptr;
+  const List_t *const list = context;
+  const void *data         = nullptr;
 
   if (1U != argc) {
     print("Usage: find <service>");
@@ -238,22 +267,24 @@ static void command_list_show_(
   }
 }
 
+// clang-format off
 static const ArgCallbackPair_t stack_commands_[] = {
-  {.arg = "push", .help = "Push secret: push <service> <password>", .callback = command_stack_push_},
-  {.arg = "pop", .help = "Pop and show the top secret", .callback = command_stack_pop_},
-  {.arg = "find", .help = "Show secret: find <service>", .callback = command_stack_find_},
-  {.arg = "edit", .help = "Change password: edit <service> <password>", .callback = command_stack_edit_},
+  {.arg = "push", .help = "Add new service: push <service> <password>", .callback = command_stack_push_},
+  {.arg = "pop", .help = "Undo the last push / edit", .callback = command_stack_pop_},
+  {.arg = "find", .help = "Show latest version: find <service>", .callback = command_stack_find_},
+  {.arg = "edit", .help = "Add new version: edit <service> <password>", .callback = command_stack_edit_},
   {.arg = "show", .help = "Show all services", .callback = command_stack_show_},
 };
+// clang-format on
 
 // clang-format off
 static const ArgCallbackPair_t list_commands_[] = {
   {.arg = "add",  .help = "Add secret: add <service> <password>", .callback = command_list_add_},
-  {.arg = "rm",   .help = "Remove the selected secret", .callback = command_list_rm_},
+  {.arg = "rm",   .help = "Remove secret: rm <service>", .callback = command_list_rm_},
   {.arg = "next", .help = "Select and show the next secret", .callback = command_list_next_},
   {.arg = "prev", .help = "Select and show the previous secret", .callback = command_list_prev_},
-  {.arg = "edit", .help = "Replace the selected secret: edit <service> <password>", .callback = command_list_edit_},
-  {.arg = "find", .help = "Select and show secret: find <service>", .callback = command_list_find_},
+  {.arg = "edit", .help = "Change password: edit <service> <password>", .callback = command_list_edit_},
+  {.arg = "find", .help = "Show secret: find <service>", .callback = command_list_find_},
   {.arg = "cur",  .help = "Show the selected secret", .callback = command_list_cur_},
   {.arg = "show", .help = "Show all services", .callback = command_list_show_},
 };
