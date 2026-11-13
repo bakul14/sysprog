@@ -186,3 +186,27 @@ void list_data_free(void **const data)
     *data = nullptr;
   }
 }
+
+bool list_find(
+  const List_t *const list, const ListMatch_t match, const void *const key, const void **data_out)
+{
+  bool ret = false;
+
+  data_out = nullptr;
+
+  if ((nullptr != list) && (nullptr != match)) {
+    // clang-format off
+    for (const Node_t *node = list->first_node->next;
+        (nullptr != node) && (nullptr == data_out);
+        (node = node->next))
+    // clang-format on
+    {
+      if (match(node->data, node->data_size, key)) {
+        *data_out = node->data;
+        ret       = true;
+      }
+    }
+  }
+
+  return ret;
+}

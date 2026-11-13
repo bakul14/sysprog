@@ -20,4 +20,9 @@ bool list_pop_front(List_t *const list, void **const data, size_t *const size);
 
 void list_data_free(void **const data);
 
+typedef bool (*ListMatch_t)(const void *const data, const size_t size, const void *const key);
+
+bool list_find(
+  const List_t *const list, const ListMatch_t match, const void *const key, const void **data_out);
+
 #endif
