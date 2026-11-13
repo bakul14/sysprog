@@ -72,16 +72,37 @@ static inline void on_exit_(EmbeddedCli *const cli, char *const args, void *cons
   is_running_   = false;
 }
 
-static inline bool add_exit_command_()
+static inline void on_clear_(EmbeddedCli *const cli, char *const args, void *const context)
 {
-  const CliCommandBinding binding = {
+  (void)cli;
+  (void)args;
+  (void)context;
+
+  static constexpr char k_clear_screen[] = "\x1b[3J\x1b[2J\x1b[H";
+
+  ssize_t null = 0U;
+  null         = write(STDOUT_FILENO, k_clear_screen, sizeof(k_clear_screen) - 1U);
+  (void)null;
+}
+
+static inline bool add_builtin_commands_()
+{
+  const CliCommandBinding exit_binding = {
     .name         = "exit",
     .help         = "Exit the application",
     .tokenizeArgs = false,
     .context      = nullptr,
     .binding      = on_exit_};
 
-  return embeddedCliAddBinding(embedded_cli_, binding);
+  const CliCommandBinding clear_binding = {
+    .name         = "clear",
+    .help         = "Clear the screen",
+    .tokenizeArgs = false,
+    .context      = nullptr,
+    .binding      = on_clear_};
+
+  return embeddedCliAddBinding(embedded_cli_, exit_binding) &&
+         embeddedCliAddBinding(embedded_cli_, clear_binding);
 }
 
 static inline void enable_raw_mode_()
@@ -99,7 +120,7 @@ static inline bool backend_init_()
 
   if (nullptr == embedded_cli_) {
     EmbeddedCliConfig *const config = embeddedCliDefaultConfig();
-    config->maxBindingCount         = (uint16_t)(k_max_commands + 1U); /* +1 for exit */
+    config->maxBindingCount         = (uint16_t)(k_max_commands + 2U); /* +2 for exit, clear */
     config->cmdBufferSize           = 256U;
 
     embedded_cli_ = embeddedCliNew(config);
@@ -107,7 +128,7 @@ static inline bool backend_init_()
     if (nullptr != embedded_cli_) {
       embedded_cli_->writeChar = write_char;
 
-      if (add_exit_command_()) {
+      if (add_builtin_commands_()) {
         enable_raw_mode_();
         is_running_ = true;
         ret         = true;
