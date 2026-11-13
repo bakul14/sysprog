@@ -27,7 +27,6 @@ bool stack_find(
 
 typedef void (*StackVisit_t)(const void *const data, const size_t size, void *const context);
 
-/* Visits items from top to bottom */
 void stack_foreach(const Stack_t *const stack, const StackVisit_t visit, void *const context);
 
 #endif
