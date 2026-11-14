@@ -23,14 +23,14 @@ int main(const int argc, char *argv[])
   List_t *const list   = ('l' == option) ? list_init() : nullptr;
   Stack_t *const stack = ('s' == option) ? stack_init() : nullptr;
 
-  bool init_status = true;
+  bool init_ok = true;
 
-  init_status = init_status && cli_init();
-  init_status = init_status && (list || stack);
-  init_status = init_status && (!stack || cli_add_commands(&k_stack_commands, stack));
-  init_status = init_status && (!list || cli_add_commands(&k_list_commands, list));
+  init_ok = init_ok && cli_init();
+  init_ok = init_ok && (list || stack);
+  init_ok = init_ok && (!stack || cli_add_commands(&k_stack_commands, stack));
+  init_ok = init_ok && (!list || cli_add_commands(&k_list_commands, list));
 
-  if (init_status) {
+  if (init_ok) {
     while (cli_process()) {
       nanosleep(&k_main_loop_period, nullptr);
     }
