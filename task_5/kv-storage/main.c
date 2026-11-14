@@ -25,8 +25,8 @@ int main(const int argc, char *argv[])
 
   bool init_status = true;
 
-  init_status = init_status && (list || stack);
   init_status = init_status && cli_init();
+  init_status = init_status && (list || stack);
   init_status = init_status && (!stack || cli_add_commands(&k_stack_commands, stack));
   init_status = init_status && (!list || cli_add_commands(&k_list_commands, list));
 
@@ -36,7 +36,7 @@ int main(const int argc, char *argv[])
     }
     ret = EXIT_SUCCESS;
   } else {
-    fprintf(stderr, "Usage: %s --stack | --list\n", argv[0]);
+    fprintf(stderr, "Usage: %s --stack | --list\n\r", argv[0]);
   }
 
   cli_deinit();
