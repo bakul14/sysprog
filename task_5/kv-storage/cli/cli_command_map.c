@@ -29,26 +29,17 @@ static void visit_key_(const void *const data, const size_t size, void *const co
   }
 }
 
-typedef struct StackShowContext {
-  const Stack_t *stack;
-  CliPrint_t print;
-} StackShowContext_t;
-
-static void visit_latest_key_(const void *const data, const size_t size, void *const context)
+static void print_size_error_(const CliPrint_t print)
 {
-  const StackShowContext_t *const show = context;
-  const SecretData_t *const secret     = data;
-  const void *latest                   = nullptr;
-
+  char line[64U] = {};
   // clang-format off
-  const bool is_latest = (sizeof(SecretData_t) == size) &&
-                         stack_find(show->stack, secret_match_key, secret->key, &latest) &&
-                         (latest == data);
+  snprintf(
+    line,
+    sizeof(line),
+    "ERROR: key and secret must be shorter than %zu chars",
+    k_secret_field_size);
   // clang-format on
-
-  if (is_latest) {
-    print_key_(show->print, secret);
-  }
+  print(line);
 }
 
 static void command_stack_push_(
@@ -60,7 +51,7 @@ static void command_stack_push_(
   if (2U != argc) {
     print("Usage: push <key> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: key and secret must be shorter than 64 chars");
+    print_size_error_(print);
   } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -108,12 +99,12 @@ static void command_stack_show_(
   (void)argv;
 
   const Stack_t *const stack = context;
-  StackShowContext_t show    = {.stack = stack, .print = print};
+  CliPrint_t print_copy      = print;
 
   if (0U != argc) {
     print("Usage: show");
   } else {
-    stack_foreach(stack, visit_latest_key_, &show);
+    stack_foreach(stack, visit_key_, &print_copy);
   }
 }
 
@@ -127,7 +118,7 @@ static void command_list_add_(
   if (2U != argc) {
     print("Usage: add <key> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: key and secret must be shorter than 64 chars");
+    print_size_error_(print);
   } else if (list_find(list, secret_match_key, argv[0], &existing)) {
     print("ERROR: key already exists, use edit");
   } else if (list_push_back(list, &secret, sizeof(secret))) {
@@ -194,7 +185,7 @@ static void command_list_edit_(
   if (2U != argc) {
     print("Usage: edit <key> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: key and secret must be shorter than 64 chars");
+    print_size_error_(print);
   } else if (list_edit(list, secret_match_key, argv[0], &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -267,7 +258,7 @@ static const ArgCallbackPair_t list_commands_[] = {
   {.arg = "get",  .help = "Show secret: get <key>", .callback = command_list_get_},
   {.arg = "show", .help = "Show all keys", .callback = command_list_show_},
 };
-//clang-format on
+// clang-format on
 
 const CliCommandMap_t k_stack_commands = {
   .arg_callback = stack_commands_, .num = sizeof(stack_commands_) / sizeof(stack_commands_[0])};

@@ -19,7 +19,7 @@ static inline bool double_stack_(Stack_t *const stack)
 {
   bool ret = false;
 
-  void *const new_stack = realloc((void *const)(stack->cell), (stack->size) * sizeof(Cell_t) * 2U);
+  void *const new_stack = realloc(stack->cell, (stack->size) * sizeof(Cell_t) * 2U);
 
   if (nullptr != new_stack) {
     stack->cell = new_stack;
@@ -37,7 +37,7 @@ Stack_t *stack_init()
   if (nullptr != stack) {
     constexpr size_t k_initial_stack_depth = 64U;
 
-    Cell_t *const cell_area = (Cell_t *const)malloc(k_initial_stack_depth * sizeof(Cell_t));
+    Cell_t *const cell_area = malloc(k_initial_stack_depth * sizeof(Cell_t));
 
     if (nullptr != cell_area) {
       stack->cell = cell_area;
@@ -56,7 +56,7 @@ void stack_deinit(Stack_t *const stack)
 {
   if (nullptr != stack) {
     for (size_t i = 0U; i < stack->used; ++i) {
-      free((void *)(stack->cell[i].data));
+      free(stack->cell[i].data);
     }
     free(stack->cell);
     free(stack);

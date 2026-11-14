@@ -32,9 +32,8 @@ static bool is_running_ = false;
 static inline void write_char(EmbeddedCli *const cli, const char c)
 {
   (void)cli;
-  ssize_t null = 0U;
-  null         = write(STDOUT_FILENO, &c, 1);
-  (void)null;
+  const ssize_t written = write(STDOUT_FILENO, &c, 1);
+  (void)written;
 }
 
 static inline void print_(const char *const string)
@@ -80,9 +79,8 @@ static inline void on_clear_(EmbeddedCli *const cli, char *const args, void *con
 
   constexpr char k_clear_screen[] = "\x1b[3J\x1b[2J\x1b[H";
 
-  ssize_t null = 0;
-  null         = write(STDOUT_FILENO, k_clear_screen, sizeof(k_clear_screen) - 1U);
-  (void)null;
+  const ssize_t written = write(STDOUT_FILENO, k_clear_screen, sizeof(k_clear_screen) - 1U);
+  (void)written;
 }
 
 static inline bool add_builtin_commands_()
