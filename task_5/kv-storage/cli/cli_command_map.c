@@ -290,8 +290,8 @@ static void command_list_show_(
 // clang-format off
 static const ArgCallbackPair_t stack_commands_[] = {
   {.arg = "push", .help = "Add new service: push <service> <secret>", .callback = command_stack_push_},
-  {.arg = "pop", .help = "Undo the last push / edit", .callback = command_stack_pop_},
-  {.arg = "get", .help = "Show secret of the latest version: get <service>", .callback = command_stack_get_},
+  {.arg = "pop",  .help = "Undo the last push / edit", .callback = command_stack_pop_},
+  {.arg = "get",  .help = "Show secret of the latest version: get <service>", .callback = command_stack_get_},
   {.arg = "edit", .help = "Add new version: edit <service> <secret>", .callback = command_stack_edit_},
   {.arg = "show", .help = "Show all services", .callback = command_stack_show_},
 };
