@@ -13,4 +13,6 @@ static const struct option k_kvs_long_options[] = {
 
 };
 
+constexpr char k_help_message[] = "Usage: \n\r    %s --list\n\r    %s --stack\n\r";
+
 #endif /* OPTIONS_H */

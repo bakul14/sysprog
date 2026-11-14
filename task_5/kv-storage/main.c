@@ -36,7 +36,7 @@ int main(const int argc, char *argv[])
     }
     ret = EXIT_SUCCESS;
   } else {
-    fprintf(stderr, "Usage: %s --stack | --list\n\r", argv[0]);
+    fprintf(stderr, k_help_message, argv[0], argv[0]);
   }
 
   cli_deinit();
