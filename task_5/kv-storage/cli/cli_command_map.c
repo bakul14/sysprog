@@ -11,13 +11,13 @@ static void print_secret_(const CliPrint_t print, const void *const data)
   const SecretData_t *const secret = data;
 
   char line[2U * k_secret_field_size + 8U] = {};
-  snprintf(line, sizeof(line), "%s: %s", secret->service, secret->secret);
+  snprintf(line, sizeof(line), "%s: %s", secret->key, secret->val);
   print(line);
 }
 
 static void print_service_(const CliPrint_t print, const void *const data)
 {
-  print(((const SecretData_t *)data)->service);
+  print(((const SecretData_t *)data)->key);
 }
 
 static void visit_service_(const void *const data, const size_t size, void *const context)
@@ -42,7 +42,7 @@ static void visit_latest_service_(const void *const data, const size_t size, voi
 
   // clang-format off
   const bool is_latest = (sizeof(SecretData_t) == size) &&
-                         stack_find(show->stack, secret_match_service, secret->service, &latest) &&
+                         stack_find(show->stack, secret_match_key, secret->key, &latest) &&
                          (latest == data);
   // clang-format on
 
@@ -62,7 +62,7 @@ static void command_stack_push_(
     print("Usage: push <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and secret must be shorter than 64 chars");
-  } else if (stack_find(stack, secret_match_service, argv[0], &existing)) {
+  } else if (stack_find(stack, secret_match_key, argv[0], &existing)) {
     print("ERROR: service already exists, use edit");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
@@ -98,7 +98,7 @@ static void command_stack_get_(
 
   if (1U != argc) {
     print("Usage: get <service>");
-  } else if (stack_find(stack, secret_match_service, argv[0], &data)) {
+  } else if (stack_find(stack, secret_match_key, argv[0], &data)) {
     print_secret_(print, data);
   } else {
     print("ERROR: not found");
@@ -116,7 +116,7 @@ static void command_stack_edit_(
     print("Usage: edit <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and secret must be shorter than 64 chars");
-  } else if (!stack_find(stack, secret_match_service, argv[0], &existing)) {
+  } else if (!stack_find(stack, secret_match_key, argv[0], &existing)) {
     print("ERROR: not found");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
@@ -151,7 +151,7 @@ static void command_list_add_(
     print("Usage: add <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and secret must be shorter than 64 chars");
-  } else if (list_find(list, secret_match_service, argv[0], &existing)) {
+  } else if (list_find(list, secret_match_key, argv[0], &existing)) {
     print("ERROR: service already exists, use edit");
   } else if (list_push_back(list, &secret, sizeof(secret))) {
     print("OK");
@@ -167,7 +167,7 @@ static void command_list_rm_(
 
   if (1U != argc) {
     print("Usage: rm <service>");
-  } else if (list_remove(list, secret_match_service, argv[0])) {
+  } else if (list_remove(list, secret_match_key, argv[0])) {
     print("OK");
   } else {
     print("ERROR: not found");
@@ -218,7 +218,7 @@ static void command_list_edit_(
     print("Usage: edit <service> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: service and secret must be shorter than 64 chars");
-  } else if (list_edit(list, secret_match_service, argv[0], &secret, sizeof(secret))) {
+  } else if (list_edit(list, secret_match_key, argv[0], &secret, sizeof(secret))) {
     print("OK");
   } else {
     print("ERROR: not found");
@@ -233,7 +233,7 @@ static void command_list_find_(
 
   if (1U != argc) {
     print("Usage: find <service>");
-  } else if (list_seek(list, secret_match_service, argv[0], &data)) {
+  } else if (list_seek(list, secret_match_key, argv[0], &data)) {
     print_service_(print, data);
   } else {
     print("ERROR: not found");
@@ -248,7 +248,7 @@ static void command_list_get_(
 
   if (1U != argc) {
     print("Usage: get <service>");
-  } else if (list_find(list, secret_match_service, argv[0], &data)) {
+  } else if (list_find(list, secret_match_key, argv[0], &data)) {
     print_secret_(print, data);
   } else {
     print("ERROR: not found");
