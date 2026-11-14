@@ -29,19 +29,19 @@ static bool is_raw_mode_ = false;
 
 static bool is_running_ = false;
 
-static inline void write_char(EmbeddedCli *const cli, const char c)
+static void write_char(EmbeddedCli *const cli, const char c)
 {
   (void)cli;
   const ssize_t written = write(STDOUT_FILENO, &c, 1);
   (void)written;
 }
 
-static inline void print_(const char *const string)
+static void print_(const char *const string)
 {
   embeddedCliPrint(embedded_cli_, string);
 }
 
-static inline void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_ptr)
+static void on_binding_(EmbeddedCli *const cli, char *const args, void *const binding_ptr)
 {
   (void)cli;
 
@@ -62,7 +62,7 @@ static inline void on_binding_(EmbeddedCli *const cli, char *const args, void *c
   }
 }
 
-static inline void on_exit_(EmbeddedCli *const cli, char *const args, void *const context)
+static void on_exit_(EmbeddedCli *const cli, char *const args, void *const context)
 {
   (void)cli;
   (void)args;
@@ -71,7 +71,7 @@ static inline void on_exit_(EmbeddedCli *const cli, char *const args, void *cons
   is_running_   = false;
 }
 
-static inline void on_clear_(EmbeddedCli *const cli, char *const args, void *const context)
+static void on_clear_(EmbeddedCli *const cli, char *const args, void *const context)
 {
   (void)cli;
   (void)args;
