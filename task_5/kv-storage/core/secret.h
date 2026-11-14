@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <string.h>
 
-static constexpr size_t k_secret_field_size = 64U;
+constexpr size_t k_secret_field_size = 64U;
 
 typedef struct SecretData {
   char key[k_secret_field_size];
