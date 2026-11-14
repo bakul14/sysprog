@@ -56,14 +56,11 @@ static void command_stack_push_(
 {
   Stack_t *const stack = context;
   SecretData_t secret  = {};
-  const void *existing = nullptr;
 
   if (2U != argc) {
     print("Usage: push <key> <secret>");
   } else if (!secret_fill(&secret, argv[0], argv[1])) {
     print("ERROR: key and secret must be shorter than 64 chars");
-  } else if (stack_find(stack, secret_match_key, argv[0], &existing)) {
-    print("ERROR: key already exists, use edit");
   } else if (stack_push(stack, &secret, sizeof(secret))) {
     print("OK");
   } else {
@@ -102,26 +99,6 @@ static void command_stack_get_(
     print_secret_(print, data);
   } else {
     print("ERROR: not found");
-  }
-}
-
-static void command_stack_edit_(
-  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
-{
-  Stack_t *const stack = context;
-  SecretData_t secret  = {};
-  const void *existing = nullptr;
-
-  if (2U != argc) {
-    print("Usage: edit <key> <secret>");
-  } else if (!secret_fill(&secret, argv[0], argv[1])) {
-    print("ERROR: key and secret must be shorter than 64 chars");
-  } else if (!stack_find(stack, secret_match_key, argv[0], &existing)) {
-    print("ERROR: not found");
-  } else if (stack_push(stack, &secret, sizeof(secret))) {
-    print("OK");
-  } else {
-    print("ERROR: edit failed");
   }
 }
 
@@ -255,23 +232,6 @@ static void command_list_get_(
   }
 }
 
-static void command_list_cur_(
-  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
-{
-  (void)argv;
-
-  const List_t *const list = context;
-  const void *data         = nullptr;
-
-  if (0U != argc) {
-    print("Usage: cur");
-  } else if (list_current(list, &data)) {
-    print_key_(print, data);
-  } else {
-    print("ERROR: no item selected");
-  }
-}
-
 static void command_list_show_(
   void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
 {
@@ -289,10 +249,9 @@ static void command_list_show_(
 
 // clang-format off
 static const ArgCallbackPair_t stack_commands_[] = {
-  {.arg = "push", .help = "Add new key: push <key> <secret>", .callback = command_stack_push_},
-  {.arg = "pop",  .help = "Undo the last push / edit", .callback = command_stack_pop_},
+  {.arg = "push", .help = "Add key or its new version: push <key> <secret>", .callback = command_stack_push_},
+  {.arg = "pop",  .help = "Undo the last push", .callback = command_stack_pop_},
   {.arg = "get",  .help = "Show secret of the latest version: get <key>", .callback = command_stack_get_},
-  {.arg = "edit", .help = "Add new version: edit <key> <secret>", .callback = command_stack_edit_},
   {.arg = "show", .help = "Show all keys", .callback = command_stack_show_},
 };
 // clang-format on
@@ -306,7 +265,6 @@ static const ArgCallbackPair_t list_commands_[] = {
   {.arg = "edit", .help = "Change secret: edit <key> <secret>", .callback = command_list_edit_},
   {.arg = "find", .help = "Select key: find <key>", .callback = command_list_find_},
   {.arg = "get",  .help = "Show secret: get <key>", .callback = command_list_get_},
-  {.arg = "cur",  .help = "Show the selected key", .callback = command_list_cur_},
   {.arg = "show", .help = "Show all keys", .callback = command_list_show_},
 };
 //clang-format on
