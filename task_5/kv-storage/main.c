@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200809L /* for nanosleep(...) */
+#define _POSIX_C_SOURCE 200809L /* for nanosleep(...) with the '-std=c23' flag */
 
 #include "common/options.h"
 
