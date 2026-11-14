@@ -20,7 +20,7 @@ SOURCES = \
 	core/list.c \
 	core/stack.c \
 	main.c
-	
+
 linux:
 	bear -- cc $(ARGS) -c $(SOURCES) $(INCLUDES)
 	cc $(notdir $(SOURCES:.c=.o)) -o $(TARGET)
