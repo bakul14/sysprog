@@ -78,9 +78,9 @@ static inline void on_clear_(EmbeddedCli *const cli, char *const args, void *con
   (void)args;
   (void)context;
 
-  static constexpr char k_clear_screen[] = "\x1b[3J\x1b[2J\x1b[H";
+  constexpr char k_clear_screen[] = "\x1b[3J\x1b[2J\x1b[H";
 
-  ssize_t null = 0U;
+  ssize_t null = 0;
   null         = write(STDOUT_FILENO, k_clear_screen, sizeof(k_clear_screen) - 1U);
   (void)null;
 }

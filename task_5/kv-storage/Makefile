@@ -6,9 +6,10 @@ ARGS = \
 	-std=c23 \
 	-O2 \
 	-Wall \
+	-Werror \
 	-Wextra \
 	-Wpedantic \
-	-Werror
+	-Wsign-conversion
 
 INCLUDES = \
 	-Icli/embedded-cli/lib/include/
