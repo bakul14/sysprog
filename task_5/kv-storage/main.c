@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L /* for nanosleep(...) with the '-std=c23' flag */
 
-#include "common/options.h"
+#include "options.h"
 
 #include "cli/cli.h"
 #include "cli/cli_command_map.h"
