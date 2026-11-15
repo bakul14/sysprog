@@ -8,3 +8,5 @@ kv-storage
 !kv-storage/
 compile_commands.json
 .cache
+heapsort
+!heapsort/
