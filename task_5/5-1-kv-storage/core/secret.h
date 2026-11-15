@@ -19,13 +19,13 @@ static inline bool secret_fill(
   const bool input_ok = (nullptr != secret) && (nullptr != key) && (nullptr != val);
 
   if (input_ok) {
-    const size_t key_len    = strlen(key);
-    const size_t secret_len = strlen(val);
+    const size_t key_len = strlen(key);
+    const size_t val_len = strlen(val);
 
-    if ((key_len < k_secret_field_size) && (secret_len < k_secret_field_size)) {
+    if ((key_len < k_secret_field_size) && (val_len < k_secret_field_size)) {
       *secret = (SecretData_t){};
       memcpy(secret->key, key, key_len);
-      memcpy(secret->val, val, secret_len);
+      memcpy(secret->val, val, val_len);
       ret = true;
     }
   }
