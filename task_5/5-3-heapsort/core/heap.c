@@ -5,8 +5,8 @@
 static inline bool is_higher_(
   const Array_t *const array, const HeapPolicy_t policy, const size_t lhs, const size_t rhs)
 {
-  const long long a = array_at(array, lhs);
-  const long long b = array_at(array, rhs);
+  const int64_t a = array_at(array, lhs);
+  const int64_t b = array_at(array, rhs);
 
   return (HEAP_POLICY_MIN == policy) ? (a > b) : (a < b);
 }
@@ -28,7 +28,8 @@ static void sift_down_(
 
 void heap_sort(Array_t *const array, const HeapPolicy_t policy)
 {
-  const size_t count = array_size(array);
+  const bool policy_ok = (HEAP_POLICY_MIN == policy) || (HEAP_POLICY_MAX == policy);
+  const size_t count   = policy_ok ? array_size(array) : 0U;
 
   for (size_t i = count / 2U; i > 0U; --i) {
     sift_down_(array, policy, count, i - 1U);

@@ -14,6 +14,7 @@ ARGS = \
 SOURCES = \
 	core/array.c \
 	core/heap.c \
+	heapsort.c \
 	parser/parser.c \
 	main.c
 

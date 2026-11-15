@@ -1,10 +1,11 @@
 #include "array.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 typedef struct Array {
-  long long *items;
+  int64_t *items;
   size_t size;
   size_t used;
 } Array_t;
@@ -13,7 +14,10 @@ static inline bool double_array_(Array_t *const array)
 {
   bool ret = false;
 
-  long long *const new_items = realloc(array->items, array->size * sizeof(long long) * 2U);
+  const bool size_ok = array->size <= (SIZE_MAX / (2U * sizeof(*array->items)));
+
+  int64_t *const new_items =
+    size_ok ? realloc(array->items, array->size * sizeof(*array->items) * 2U) : nullptr;
 
   if (nullptr != new_items) {
     array->items = new_items;
@@ -31,7 +35,7 @@ Array_t *array_init()
   if (nullptr != array) {
     constexpr size_t k_initial_array_size = 64U;
 
-    long long *const items = malloc(k_initial_array_size * sizeof(long long));
+    int64_t *const items = malloc(k_initial_array_size * sizeof(int64_t));
 
     if (nullptr != items) {
       array->items = items;
@@ -54,7 +58,7 @@ void array_deinit(Array_t *const array)
   }
 }
 
-bool array_push(Array_t *const array, const long long item)
+bool array_push(Array_t *const array, const int64_t item)
 {
   bool ret = false;
 
@@ -76,7 +80,7 @@ size_t array_size(const Array_t *const array)
   return (nullptr != array) ? array->used : 0U;
 }
 
-long long array_at(const Array_t *const array, const size_t index)
+int64_t array_at(const Array_t *const array, const size_t index)
 {
   return ((nullptr != array) && (index < array->used)) ? array->items[index] : 0;
 }
@@ -84,8 +88,8 @@ long long array_at(const Array_t *const array, const size_t index)
 void array_swap(Array_t *const array, const size_t lhs, const size_t rhs)
 {
   if ((nullptr != array) && (lhs < array->used) && (rhs < array->used)) {
-    const long long tmp = array->items[lhs];
-    array->items[lhs]   = array->items[rhs];
-    array->items[rhs]   = tmp;
+    const int64_t tmp = array->items[lhs];
+    array->items[lhs] = array->items[rhs];
+    array->items[rhs] = tmp;
   }
 }
