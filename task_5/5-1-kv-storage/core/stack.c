@@ -1,6 +1,7 @@
 #include "stack.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,7 +20,10 @@ static inline bool double_stack_(Stack_t *const stack)
 {
   bool ret = false;
 
-  void *const new_stack = realloc(stack->cell, (stack->size) * sizeof(Cell_t) * 2U);
+  const bool size_ok = stack->size <= (SIZE_MAX / (2U * sizeof(*stack->cell)));
+
+  void *const new_stack =
+    size_ok ? realloc(stack->cell, stack->size * sizeof(*stack->cell) * 2U) : nullptr;
 
   if (nullptr != new_stack) {
     stack->cell = new_stack;

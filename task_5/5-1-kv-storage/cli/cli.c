@@ -32,7 +32,7 @@ static bool is_running_ = false;
 static void write_char(EmbeddedCli *const cli, const char c)
 {
   (void)cli;
-  const ssize_t written = write(STDOUT_FILENO, &c, 1);
+  const ssize_t written = write(STDOUT_FILENO, &c, 1U);
   (void)written;
 }
 
@@ -207,7 +207,7 @@ bool cli_process()
   bool ret = false;
 
   char c = '\0';
-  if (is_running_ && (read(STDIN_FILENO, &c, 1) > 0)) {
+  if (is_running_ && (read(STDIN_FILENO, &c, 1U) > 0)) {
     embeddedCliReceiveChar(embedded_cli_, c);
     embeddedCliProcess(embedded_cli_);
     ret = true;

@@ -23,7 +23,7 @@ List_t *list_init()
   List_t *list = malloc(sizeof(List_t));
 
   if (nullptr != list) {
-    Node_t *const dummy_node = calloc(1, sizeof(Node_t));
+    Node_t *const dummy_node = calloc(1U, sizeof(Node_t));
 
     if (nullptr != dummy_node) {
       list->first_node = dummy_node;
