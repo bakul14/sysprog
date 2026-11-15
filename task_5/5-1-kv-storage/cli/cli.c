@@ -1,4 +1,4 @@
-#define _DEFAULT_SOURCE /* It is used to compile cfmakeraw() */
+#define _DEFAULT_SOURCE /* for cfmakeraw() with the '-std=c23' flag */
 
 #include "cli.h"
 
