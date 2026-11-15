@@ -15,8 +15,8 @@ typedef struct ArgCallbackPair {
 } ArgCallbackPair_t;
 
 typedef struct CliCommandMap {
-  const ArgCallbackPair_t *arg_callback;
-  size_t num;
+  const ArgCallbackPair_t *const arg_callback;
+  const size_t num;
 } CliCommandMap_t;
 
 bool cli_init();
