@@ -31,7 +31,7 @@ static void visit_key_(const void *const data, const size_t size, void *const co
 
 static void print_size_error_(const CliPrint_t print)
 {
-  char line[64U] = {};
+  char line[k_secret_field_size] = {};
   // clang-format off
   snprintf(
     line,

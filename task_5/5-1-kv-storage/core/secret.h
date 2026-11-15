@@ -11,12 +11,8 @@ typedef struct SecretData {
   char val[k_secret_field_size];
 } SecretData_t;
 
-// clang-format off
 static inline bool secret_fill(
-  SecretData_t *const secret,
-  const char *const key,
-  const char *const val)
-// clang-format on
+  SecretData_t *const secret, const char *const key, const char *const val)
 {
   bool ret = false;
 
@@ -37,12 +33,8 @@ static inline bool secret_fill(
   return ret;
 }
 
-// clang-format off
 static inline bool secret_match_key(
-  const void *const data,
-  const size_t size,
-  const void *const key)
-// clang-format on
+  const void *const data, const size_t size, const void *const key)
 {
   bool ret = false;
 
