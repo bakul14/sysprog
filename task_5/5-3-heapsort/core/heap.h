@@ -1,5 +1,4 @@
-#ifndef HEAP_H
-#define HEAP_H
+#pragma once
 
 #include "array.h"
 
@@ -11,5 +10,3 @@ typedef enum HeapPolicy
 } HeapPolicy_t;
 
 void heap_sort(Array_t *const array, const HeapPolicy_t policy);
-
-#endif

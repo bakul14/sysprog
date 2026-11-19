@@ -1,5 +1,4 @@
-#ifndef CLI_H
-#define CLI_H
+#pragma once
 
 #include <stddef.h>
 
@@ -26,5 +25,3 @@ bool cli_add_commands(const CliCommandMap_t *const map, void *const context);
 bool cli_process();
 
 void cli_deinit();
-
-#endif

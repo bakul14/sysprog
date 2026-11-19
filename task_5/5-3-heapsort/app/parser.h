@@ -1,5 +1,4 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
 #include "../core/array.h"
 
@@ -18,5 +17,3 @@
 [[nodiscard]] int parser_read_string(const char *const string, Array_t *const array);
 
 void parser_print(const Array_t *const array);
-
-#endif

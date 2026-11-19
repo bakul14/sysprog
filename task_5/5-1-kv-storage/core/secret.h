@@ -1,5 +1,4 @@
-#ifndef SECRET_H
-#define SECRET_H
+#pragma once
 
 #include <stddef.h>
 #include <string.h>
@@ -46,5 +45,3 @@ static inline bool secret_match_key(
 
   return ret;
 }
-
-#endif

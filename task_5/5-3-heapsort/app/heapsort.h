@@ -1,5 +1,4 @@
-#ifndef HEAPSORT_H
-#define HEAPSORT_H
+#pragma once
 
 #include "../core/heap.h"
 
@@ -28,5 +27,3 @@ typedef enum HsSource
  */
 [[nodiscard]] int hs_process_request(
   const HeapPolicy_t policy, const HsSource_t source, const char *const input);
-
-#endif /* HEAPSORT_H */

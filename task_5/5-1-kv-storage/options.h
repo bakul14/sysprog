@@ -1,5 +1,4 @@
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 #include <getopt.h>
 
@@ -14,5 +13,3 @@ static const struct option k_kvs_long_options[] = {
 };
 
 constexpr char k_kvs_help_message[] = "Usage:\n    %s -l, --list\n    %s -s, --stack\n";
-
-#endif /* OPTIONS_H */

@@ -1,5 +1,4 @@
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 #include <getopt.h>
 
@@ -16,5 +15,3 @@ static const struct option k_hs_long_options[] = {
 
 constexpr char k_hs_help_message[] =
   "Usage:\n    %s --min | --max -f, --file <path>\n    %s --min | --max [--] \"<numbers>\"\n";
-
-#endif /* OPTIONS_H */
