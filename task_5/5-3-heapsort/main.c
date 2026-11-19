@@ -1,4 +1,4 @@
-#include "heapsort.h"
+#include "app/heapsort.h"
 #include "options.h"
 
 #include <getopt.h>

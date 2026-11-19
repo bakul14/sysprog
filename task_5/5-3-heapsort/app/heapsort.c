@@ -1,7 +1,7 @@
 #include "heapsort.h"
 
-#include "core/array.h"
-#include "parser/parser.h"
+#include "parser.h"
+#include "../core/array.h"
 
 #include <stdio.h>
 #include <sysexits.h>

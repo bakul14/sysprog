@@ -1,7 +1,7 @@
 #ifndef HEAPSORT_H
 #define HEAPSORT_H
 
-#include "core/heap.h"
+#include "../core/heap.h"
 
 typedef enum HsSource
 {

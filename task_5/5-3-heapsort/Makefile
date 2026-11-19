@@ -12,10 +12,10 @@ ARGS = \
 	-Wsign-conversion
 
 SOURCES = \
+	app/heapsort.c \
+	app/parser.c \
 	core/array.c \
 	core/heap.c \
-	heapsort.c \
-	parser/parser.c \
 	main.c
 
 linux:
