@@ -39,7 +39,7 @@ int main(const int argc, char *argv[])
   cli_deinit();
 
   if (!init_ok) {
-    fprintf(stderr, k_help_message, argv[0], argv[0]);
+    fprintf(stderr, k_kvs_help_message, argv[0], argv[0]);
   }
 
   stack_deinit(stack);

@@ -49,7 +49,7 @@ int main(const int argc, char *argv[])
   const int ret = options_ok ? hs_process_request(policy, source, input) : EX_USAGE;
 
   if (EX_USAGE == ret) {
-    fprintf(stderr, k_help_message, argv[0], argv[0]);
+    fprintf(stderr, k_hs_help_message, argv[0], argv[0]);
   }
 
   return ret;
