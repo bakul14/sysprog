@@ -2,7 +2,7 @@
 
 #include <getopt.h>
 
-constexpr char k_hs_short_options[] = "f:";
+constexpr char k_hs_short_options[] = "f:Mm";
 
 static const struct option k_hs_long_options[] = {
 
@@ -14,4 +14,4 @@ static const struct option k_hs_long_options[] = {
 };
 
 constexpr char k_hs_help_message[] =
-  "Usage:\n    %s --min | --max -f, --file <path>\n    %s --min | --max [--] \"<numbers>\"\n";
+  "Usage:\n    %s --min | --max --file <path>\n    %s --min | --max [--] \"<numbers>\"\n";
