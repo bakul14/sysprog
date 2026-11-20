@@ -260,8 +260,8 @@ static const ArgCallbackPair_t list_commands_[] = {
 };
 // clang-format on
 
-const CliCommandMap_t k_stack_commands = {
+const CliCommandMap_t k_stack_command_map = {
   .arg_callback = stack_commands_, .num = sizeof(stack_commands_) / sizeof(stack_commands_[0])};
 
-const CliCommandMap_t k_list_commands = {
+const CliCommandMap_t k_list_command_map = {
   .arg_callback = list_commands_, .num = sizeof(list_commands_) / sizeof(list_commands_[0])};
