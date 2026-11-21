@@ -1,0 +1,267 @@
+#include "cli_command_map.h"
+
+#include "../core/list.h"
+#include "../core/secret.h"
+#include "../core/stack.h"
+
+#include <stdio.h>
+
+static void print_secret_(const CliPrint_t print, const void *const data)
+{
+  const SecretData_t *const secret = data;
+
+  char line[2U * k_secret_field_size + 8U] = {};
+  snprintf(line, sizeof(line), "%s: %s", secret->key, secret->val);
+  print(line);
+}
+
+static void print_key_(const CliPrint_t print, const void *const data)
+{
+  print(((const SecretData_t *)data)->key);
+}
+
+static void visit_key_(const void *const data, const size_t size, void *const context)
+{
+  const CliPrint_t *const print = context;
+
+  if (sizeof(SecretData_t) == size) {
+    print_key_(*print, data);
+  }
+}
+
+static void print_size_error_(const CliPrint_t print)
+{
+  char line[k_secret_field_size] = {};
+  // clang-format off
+  snprintf(
+    line,
+    sizeof(line),
+    "ERROR: key and secret must be shorter than %zu chars",
+    k_secret_field_size);
+  // clang-format on
+  print(line);
+}
+
+static void command_stack_push_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  Stack_t *const stack = context;
+  SecretData_t secret  = {};
+
+  if (2U != argc) {
+    print("Usage: push <key> <secret>");
+  } else if (!secret_fill(&secret, argv[0], argv[1])) {
+    print_size_error_(print);
+  } else if (stack_push(stack, &secret, sizeof(secret))) {
+    print("OK");
+  } else {
+    print("ERROR: push failed");
+  }
+}
+
+static void command_stack_pop_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  (void)argv;
+
+  Stack_t *const stack = context;
+  void *data           = nullptr;
+  size_t size          = 0U;
+
+  if (0U != argc) {
+    print("Usage: pop");
+  } else if (stack_pop(stack, &data, &size)) {
+    print_key_(print, data);
+    stack_data_free(&data);
+  } else {
+    print("ERROR: stack is empty");
+  }
+}
+
+static void command_stack_get_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  const Stack_t *const stack = context;
+  const void *data           = nullptr;
+
+  if (1U != argc) {
+    print("Usage: get <key>");
+  } else if (stack_find(stack, secret_match_key, argv[0], &data)) {
+    print_secret_(print, data);
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_stack_show_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  (void)argv;
+
+  const Stack_t *const stack = context;
+  CliPrint_t print_copy      = print;
+
+  if (0U != argc) {
+    print("Usage: show");
+  } else {
+    stack_foreach(stack, visit_key_, &print_copy);
+  }
+}
+
+static void command_list_add_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  List_t *const list   = context;
+  SecretData_t secret  = {};
+  const void *existing = nullptr;
+
+  if (2U != argc) {
+    print("Usage: add <key> <secret>");
+  } else if (!secret_fill(&secret, argv[0], argv[1])) {
+    print_size_error_(print);
+  } else if (list_find(list, secret_match_key, argv[0], &existing)) {
+    print("ERROR: key already exists, use edit");
+  } else if (list_push_back(list, &secret, sizeof(secret))) {
+    print("OK");
+  } else {
+    print("ERROR: add failed");
+  }
+}
+
+static void command_list_rm_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  List_t *const list = context;
+
+  if (1U != argc) {
+    print("Usage: rm <key>");
+  } else if (list_remove(list, secret_match_key, argv[0])) {
+    print("OK");
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_list_next_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  (void)argv;
+
+  List_t *const list = context;
+  const void *data   = nullptr;
+
+  if (0U != argc) {
+    print("Usage: next");
+  } else if (list_next(list, &data)) {
+    print_key_(print, data);
+  } else {
+    print("ERROR: end of list");
+  }
+}
+
+static void command_list_prev_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  (void)argv;
+
+  List_t *const list = context;
+  const void *data   = nullptr;
+
+  if (0U != argc) {
+    print("Usage: prev");
+  } else if (list_prev(list, &data)) {
+    print_key_(print, data);
+  } else {
+    print("ERROR: beginning of list");
+  }
+}
+
+static void command_list_edit_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  List_t *const list  = context;
+  SecretData_t secret = {};
+
+  if (2U != argc) {
+    print("Usage: edit <key> <secret>");
+  } else if (!secret_fill(&secret, argv[0], argv[1])) {
+    print_size_error_(print);
+  } else if (list_edit(list, secret_match_key, argv[0], &secret, sizeof(secret))) {
+    print("OK");
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_list_find_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  List_t *const list = context;
+  const void *data   = nullptr;
+
+  if (1U != argc) {
+    print("Usage: find <key>");
+  } else if (list_seek(list, secret_match_key, argv[0], &data)) {
+    print_key_(print, data);
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_list_get_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  const List_t *const list = context;
+  const void *data         = nullptr;
+
+  if (1U != argc) {
+    print("Usage: get <key>");
+  } else if (list_find(list, secret_match_key, argv[0], &data)) {
+    print_secret_(print, data);
+  } else {
+    print("ERROR: not found");
+  }
+}
+
+static void command_list_show_(
+  void *const context, const size_t argc, const char *const argv[], const CliPrint_t print)
+{
+  (void)argv;
+
+  const List_t *const list = context;
+  CliPrint_t print_copy    = print;
+
+  if (0U != argc) {
+    print("Usage: show");
+  } else {
+    list_foreach(list, visit_key_, &print_copy);
+  }
+}
+
+// clang-format off
+static const ArgCallbackPair_t stack_commands_[] = {
+  {.arg = "push", .help = "Add key or its new version: push <key> <secret>", .callback = command_stack_push_},
+  {.arg = "pop",  .help = "Undo the last push", .callback = command_stack_pop_},
+  {.arg = "get",  .help = "Show secret of the latest version: get <key>", .callback = command_stack_get_},
+  {.arg = "show", .help = "Show all keys", .callback = command_stack_show_},
+};
+// clang-format on
+
+// clang-format off
+static const ArgCallbackPair_t list_commands_[] = {
+  {.arg = "add",  .help = "Add secret: add <key> <secret>", .callback = command_list_add_},
+  {.arg = "rm",   .help = "Remove secret: rm <key>", .callback = command_list_rm_},
+  {.arg = "next", .help = "Select the next key", .callback = command_list_next_},
+  {.arg = "prev", .help = "Select the previous key", .callback = command_list_prev_},
+  {.arg = "edit", .help = "Change secret: edit <key> <secret>", .callback = command_list_edit_},
+  {.arg = "find", .help = "Select key: find <key>", .callback = command_list_find_},
+  {.arg = "get",  .help = "Show secret: get <key>", .callback = command_list_get_},
+  {.arg = "show", .help = "Show all keys", .callback = command_list_show_},
+};
+// clang-format on
+
+const CliCommandMap_t k_stack_command_map = {
+  .arg_callback = stack_commands_, .num = sizeof(stack_commands_) / sizeof(stack_commands_[0])};
+
+const CliCommandMap_t k_list_command_map = {
+  .arg_callback = list_commands_, .num = sizeof(list_commands_) / sizeof(list_commands_[0])};

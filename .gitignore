@@ -4,5 +4,9 @@ backups/
 disk.img
 filemanager
 !filemanager/
+kv-storage
+!kv-storage/
 compile_commands.json
 .cache
+heapsort
+!heapsort/
