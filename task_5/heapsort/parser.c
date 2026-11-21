@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,9 +32,30 @@ static bool parse_item_(const char *const token, int64_t *const item)
   return ok;
 }
 
-static int parse_stream_(FILE *const stream, Array_t *const array)
+constexpr size_t k_initial_capacity = 64U;
+
+static bool grow_(int64_t **const items, size_t *const capacity)
+{
+  const bool size_ok        = *capacity <= (SIZE_MAX / (2U * sizeof(**items)));
+  const size_t new_capacity = (0U == *capacity) ? k_initial_capacity : (2U * *capacity);
+
+  int64_t *const new_items = size_ok ? realloc(*items, new_capacity * sizeof(**items)) : nullptr;
+
+  if (nullptr != new_items) {
+    *items    = new_items;
+    *capacity = new_capacity;
+  }
+
+  return nullptr != new_items;
+}
+
+static int parse_stream_(FILE *const stream, int64_t **const items, size_t *const count)
 {
   int ret = EX_OK;
+
+  int64_t *buffer = nullptr;
+  size_t used     = 0U;
+  size_t capacity = 0U;
 
   char token[32U] = {};
   int64_t item    = 0;
@@ -45,8 +65,11 @@ static int parse_stream_(FILE *const stream, Array_t *const array)
 
     if (((EOF != next) && !isspace(next)) || !parse_item_(token, &item)) {
       ret = EX_DATAERR;
-    } else if (!array_push(array, item)) {
+    } else if ((used == capacity) && !grow_(&buffer, &capacity)) {
       ret = EX_OSERR;
+    } else {
+      buffer[used] = item;
+      ++used;
     }
   }
 
@@ -54,46 +77,48 @@ static int parse_stream_(FILE *const stream, Array_t *const array)
     ret = EX_IOERR;
   }
 
+  if (EX_OK == ret) {
+    *items = buffer;
+    *count = used;
+  } else {
+    free(buffer);
+  }
+
   return ret;
 }
 
-int parser_read_file(const char *const filepath, Array_t *const array)
+int parser_read_file(const char *const filepath, int64_t **const items, size_t *const count)
 {
   int ret = EX_NOINPUT;
+
+  *items = nullptr;
+  *count = 0U;
 
   FILE *const stream = fopen(filepath, "r");
 
   if (nullptr != stream) {
-    ret = parse_stream_(stream, array);
+    ret = parse_stream_(stream, items, count);
     fclose(stream);
   }
 
   return ret;
 }
 
-int parser_read_string(const char *const string, Array_t *const array)
+int parser_read_string(const char *const string, int64_t **const items, size_t *const count)
 {
   int ret = EX_OSERR;
+
+  *items = nullptr;
+  *count = 0U;
 
   const char *const buffer = ('\0' != *string) ? string : " ";
 
   FILE *const stream = fmemopen((void *)buffer, strlen(buffer), "r");
 
   if (nullptr != stream) {
-    ret = parse_stream_(stream, array);
+    ret = parse_stream_(stream, items, count);
     fclose(stream);
   }
 
   return ret;
-}
-
-void parser_print(const Array_t *const array)
-{
-  const size_t count = array_size(array);
-
-  for (size_t i = 0U; i < count; ++i) {
-    printf((0U == i) ? "%" PRId64 : " %" PRId64, array_at(array, i));
-  }
-
-  putchar('\n');
 }

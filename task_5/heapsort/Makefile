@@ -12,11 +12,10 @@ ARGS = \
 	-Wsign-conversion
 
 SOURCES = \
-	app/heapsort.c \
-	app/parser.c \
-	core/array.c \
-	core/heap.c \
-	main.c
+	app.c \
+	heap.c \
+	main.c \
+	parser.c
 
 linux:
 	bear -- cc $(ARGS) -c $(SOURCES)
