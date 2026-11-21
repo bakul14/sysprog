@@ -19,7 +19,7 @@ linux:
 	cc $(notdir $(SOURCES:.c=.o)) -o $(TARGET)
 
 clean:
-	rm -f kv-storage *.o
+	rm -f trapper *.o
 
 distclean: clean
 	rm -f compile_commands.json
