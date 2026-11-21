@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -13,7 +15,7 @@ int main()
 
   // clang-format off
   const struct sigaction sa = {.sa_handler = signal_callback,
-                               .sa_mask = 0,
+                               .sa_mask = {},
                                .sa_flags = SA_RESTART};
   // clang-format on
 
